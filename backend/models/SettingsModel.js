@@ -12,11 +12,15 @@ const SettingsSchema = new mongoose.Schema({
     },
     site_description: {
         type: String,
-        required: true,
     },
     rtl: {
         type: Boolean,
         default: false,
+    },
+    register_code: {
+        type: String,
+        required: true,
+        default: "123456",
     },
     schedule: [
         {

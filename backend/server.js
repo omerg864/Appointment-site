@@ -7,8 +7,8 @@ import connectDB from "./config/db.js";
 import colors from "colors";
 // routes
 import userRoutes from "./routes/UserRoutes.js";
-import appointmentRoutes from "./routes/AppointmentRoutes.js";
 import dayRoutes from "./routes/DayRoutes.js";
+import settingsRoutes from "./routes/SettingsRoutes.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,8 +30,8 @@ app.listen(process.env.PORT, () => {
 
 // routes
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/appointments", appointmentRoutes);
 app.use("/api/v1/days", dayRoutes);
+app.use("/api/v1/settings", settingsRoutes);
 
 
 if (process.env.NODE_ENV === 'production') {

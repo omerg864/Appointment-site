@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/UserModel.js';
+import Settings from '../models/SettingsModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -7,12 +8,42 @@ import jwt from 'jsonwebtoken';
 const deselect = ['-password', "-OTP", "-__v", "-createdAt", "-updatedAt"];
 
 
+const createSettings = async () => {
+    let scheduleDefaultDay = {
+        start_time: "08:00",
+        end_time: "20:00",
+        breaks: ["10:00", "14:00"],
+        interval: "30m"
+    };
+    let scheduleDefault = [];
+    for (let i = 0; i < 7; i++) {
+        scheduleDefault.push(scheduleDefaultDay);
+    }
+    var settings = await Settings.create({
+        site_header: "Appointment Site",
+        site_title: "Barber Name",
+        site_description: "",
+        rtl: false,
+        register_code: "123456",
+        schedule: scheduleDefault
+    });
+    return settings;
+}
+
 const registerUser = asyncHandler(async (req, res, next) => {
-    const { f_name, l_name, email, phone, password } = req.body;
+    const { f_name, l_name, email, phone, password, registerCode } = req.body;
     const user = await User.findOne({ "email" : { $regex : new RegExp(email, "i") } });
     if (user) {
         res.status(400)
         throw new Error("User already exists");
+    }
+    var settings = await Settings.findOne();
+    if (!settings){
+        settings = await createSettings();
+    }
+    if (settings.register_code !== registerCode) {
+        res.status(401)
+        throw new Error("Invalid register code. can't register");
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);

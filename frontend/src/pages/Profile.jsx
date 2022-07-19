@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppointmentView from "../components/AppointmentView";
+import Modal from "../components/Modal";
 
 
 
@@ -16,6 +17,13 @@ function Profile() {
     l_name: user.l_name,
     email: user.email,
     phone: user.phone,
+  });
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [appointmentSelected, setAppointmentSelected] = useState({
+    date: new Date(),
+    time: "",
+    id: "",
   });
 
   const gotoResetPassword = () => {
@@ -37,16 +45,43 @@ function Profile() {
   const appointments = [
     {
       date: new Date(),
-      time: "10:00"
+      time: "10:00",
+      id: 1
     },
     {
       date: tomorrow,
-      time: "10:00"
+      time: "10:00",
+      id: 2
     }
   ];
 
+  const cancelAppointmentModal = (appointment) => {
+    console.log(appointment);
+    setIsOpen(true);
+    setAppointmentSelected(appointment);
+  }
+
+  const cancelAppointment = () => {
+    console.log(appointmentSelected);
+    setIsOpen(false);
+  }
+
+  
+  const formatDate = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   return (
+    <>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={cancelAppointment} title="Cancel Appointment" message={"Are you sure you want to cancel this appointment?"}
+        children={ <div>
+            <a>{`${formatDate(appointmentSelected.date)}`} {`${days[appointmentSelected.date.getDay()]}`} at {`${appointmentSelected.time}`}</a>
+        </div>} submitText="Cancel Appointment" cancelText={"Close"}/>
     <div className="management-container">
       <ul className="nav nav-tabs" id="myTab" role="tablist">
             <li className="nav-item" role="presentation">
@@ -62,7 +97,7 @@ function Profile() {
         <div className="appointments-container">
             {appointments.map((appointment, index) => {
               return (
-                <AppointmentView key={index} data={appointment} index={index}/>
+                <AppointmentView key={index} data={appointment} onClick={cancelAppointmentModal} />
               );
             })}
             </div>
@@ -77,6 +112,7 @@ function Profile() {
         </div>
         </div>
     </div>
+    </>
   )
 }
 

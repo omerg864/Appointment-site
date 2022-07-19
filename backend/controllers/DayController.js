@@ -5,10 +5,10 @@ import Appointment from '../models/AppointmentModel.js';
 
 
 const checkAppointments = (appointments, time) => {
-    let returnValue = false;
+    let returnValue = [];
     for (let i = 0; i < appointments.length; i++) {
         if (appointments[i].time === time) {
-            returnValue = appointments[i];
+            returnValue.push(appointments[i]);
         }
     }
     return returnValue;
@@ -49,27 +49,26 @@ const createAppointmentsList = (date, start_time, end_time, interval) => {
     return appointments;
 }
 
-const calculateDay = (free_appointments, breaks, appointments) => {
+const calculateDay = (free_appointments, breaks, appointments, date) => {
     let schedule = [];
     free_appointments.forEach(appoint => {
         let checkAppointment = checkAppointments(appointments, appoint);
-        if (checkAppointment) {
-            schedule.push({
-                user: checkAppointment.user,
-                time: appoint,
-            });
+        if (checkAppointment.length > 0) {
+            schedule.push(...checkAppointment);
         }
         let checkBreak = checkBreaks(breaks, appoint);
         if (checkBreak) {
             schedule.push({
                 time: appoint,
-                type: 'break'
+                type: 'break',
+                date: date,
             });
         }
-        if (!checkAppointment && !checkBreak) {
+        if (checkAppointment.length === 0 && !checkBreak) {
             schedule.push({
                 time: appoint,
-                type: 'free'
+                type: 'free',
+                date: date,
             });
         }
     });
@@ -85,7 +84,7 @@ const getScheduleDay = async (req, res, next) => {
     }
     day = await day.populate('appointments.user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
     let free_appointments = createAppointmentsList(day.date, day.startTime, day.endTime, day.interval);
-    let schedule = calculateDay(free_appointments, day.breaks, day.appointments);
+    let schedule = calculateDay(free_appointments, day.breaks, day.appointments, date);
     return schedule;
 }
 

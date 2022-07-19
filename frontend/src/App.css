@@ -565,3 +565,62 @@
   color: #ffff;
   display: block;
 }
+
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 6000;
+  -moz-transition: height 1s ease;
+  -webkit-transition: height 1s ease;
+  -o-transition: height 1s ease;
+  transition: height 1s ease;
+}
+
+.relative-container {
+  position: relative;
+}
+
+#close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.user-display-container {
+  border: #A68B6A solid 1px;
+  border-radius: 5px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.user-display {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.btn-icon2 {
+  border-radius: 50%;
+  transition: background-color 0.3s;
+  margin-left: 8px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  background-color: transparent;
+  border: none;
+}
+
+.btn-icon2:hover {
+  background-color: rgba(255, 255, 255, 0.911);
+}
+
+.active-btn-icon {
+  background-color: rgba(255, 255, 255, 0.911);
+}

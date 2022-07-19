@@ -1,24 +1,24 @@
 import { MdEdit } from 'react-icons/md';
 
 
-function AppointmentButtonStaff({ user, time, type }) {
+function AppointmentButtonStaff({ appointment, onClick }) {
   return (
-    <div className={`btn-container ${type === 'free' && 'free-btn'} ${type === 'break' && 'break-btn'} ${!type && 'taken-btn'} `}>
-        {type === 'free' ? <span style={{fontSize: '20px', marginBottom: '6px'}}>{time}</span> :<span className="time-title">{time}</span>}
-        {user && (
+    <div className={`btn-container ${appointment.type === 'free' && 'free-btn'} ${appointment.type === 'break' && 'break-btn'} ${!appointment.type && 'taken-btn'} `}>
+        {appointment.type === 'free' ? <span style={{fontSize: '20px', marginBottom: '6px'}}>{appointment.time}</span> :<span className="time-title">{appointment.time}</span>}
+        {appointment.user && (
             <div className='user-title-div'>
-        <a className="user-title">{user.f_name} {user.l_name}</a>
+        <a className="user-title">{appointment.user.f_name} {appointment.user.l_name}</a>
         <div className='user-container'>
-            <span style={{fontSize: '20px'}}>{user.f_name} {user.l_name}</span>
-            <p style={{margin: 0}}>{user.phone}</p>
-            <p style={{margin: 0}}>{user.email}</p>
+            <span style={{fontSize: '20px'}}>{appointment.user.f_name} {appointment.user.l_name}</span>
+            <p style={{margin: 0}}>{appointment.user.phone}</p>
+            <p style={{margin: 0}}>{appointment.user.email}</p>
         </div>
         </div>
         )}
-        {type === 'break' && (
-        <p className="break-title">{type}</p>
+        {appointment.type === 'break' && (
+        <p className="break-title">{appointment.type}</p>
         )}
-        <button className="btn" id="btn-icon"><MdEdit color='grey'/></button>
+        <button className="btn" onClick={() => onClick(appointment)} id="btn-icon"><MdEdit color='grey'/></button>
     </div>
   )
 }

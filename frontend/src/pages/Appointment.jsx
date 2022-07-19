@@ -2,10 +2,15 @@ import Calendar from 'react-calendar';
 import '../Calendar.css';
 import { useState } from 'react';
 import AppointmentButton from '../components/AppointmentButton';
+import Modal from '../components/Modal';
 
 function Appointment() {
 
     const [date, setDate] = useState(new Date());
+
+    const [timeSelected, setTimeSelected] = useState('');
+
+    const [isOpen, setIsOpen] = useState(false);
 
 
     const appointments = [
@@ -27,7 +32,6 @@ function Appointment() {
     
 
     const disableTile = data => {
-        console.log(data);
         var today = new Date();
         today = today.addDays(-1);
         var month = today.addDays(31);
@@ -38,17 +42,33 @@ function Appointment() {
         }
     }
 
+    const bookAppointment = () => {
+    }
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const onSubmit = (time) => {
+        setIsOpen(true);
+        setTimeSelected(time);
+    }
+
     return (
+        <>
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={bookAppointment} title="Book Appointment" message={"Are you sure you want to book appointment?"}
+        children={ <div>
+            <a>{`${formatDate(date)}`} {`${days[date.getDay()]}`} at {`${timeSelected}`}</a>
+        </div>} submitText="Book" cancelText={"Cancel"}/>
         <div className="login-container">
             <h1 style={{ marginBottom: '30px' }}>Book an Appointment</h1>
             <Calendar calendarType="Hebrew" onChange={setDate}  tileDisabled={data => disableTile(data)}/>
             <h4 style={{marginTop: '20px'}}>{formatDate(date)}</h4>
                 <div className='appointments-container'>
                     {appointments.map((appointment, index) => {
-                        return <AppointmentButton time={appointment} key={index}/>
+                        return <AppointmentButton onClick={onSubmit} time={appointment} key={index}/>
                     })}
                 </div>
         </div>
+        </>
     )
 }
 

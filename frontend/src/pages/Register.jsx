@@ -11,7 +11,7 @@ function Register() {
             <FloatingLabelInput label="First Name" props={{required: true, type: "text"}} containerStyle={{marginTop: '10px'}}/>
             <FloatingLabelInput label="Last Name" props={{required: true, type: "text"}} containerStyle={{marginTop: '10px'}}/>
             <FloatingLabelInput label="Email" props={{required: true, type: "email"}} containerStyle={{marginTop: '10px'}}/>
-            <FloatingLabelInput label="Phone Number" props={{required: true, type: "text"}} containerStyle={{marginTop: '10px'}}/>
+            <FloatingLabelInput label="Phone Number" props={{required: true, type: "text", maxLength: '10'}} containerStyle={{marginTop: '10px'}}/>
             <FloatingLabelInput label="Password" props={{required: true, type: "password"}} containerStyle={{marginTop: '10px'}}/>
             <FloatingLabelInput label="Repeat Password" props={{required: true, type: "password"}} containerStyle={{marginTop: '10px'}}/>
             <FloatingLabelInput label="Registration Code" props={{required: true, type: "text", maxlength :"6"}} containerStyle={{marginTop: '10px'}}/>

@@ -76,7 +76,7 @@ const calculateDay = (free_appointments, breaks, appointments, date) => {
 }
 
 const getScheduleDay = async (req, res, next, dateFormatted) => {
-    const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date = new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]) + 1);
     var day = await Day.findOne({ date: date }).populate('appointments', ['date', 'user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
@@ -96,9 +96,9 @@ const getUserAppointments = asyncHandler(async (req, res, next) => {
 });
 
 const getDayAppointments = asyncHandler(async (req, res, next) => {
+    const date = formatToDate(req.params.date);
     const dateFormatted = req.params.date.split('-');
     let schedule = await getScheduleDay(req, res, next, dateFormatted);
-    const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     res.status(200).json({
         success: true,
         day: schedule,
@@ -109,7 +109,7 @@ const getDayAppointments = asyncHandler(async (req, res, next) => {
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     const dateFormatted = req.params.date.split('-');
     let schedule = await getScheduleDay(req, res, next, dateFormatted);
-    const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date = formatToDate(req.params.date)
     let free_appointments = [];
     schedule.forEach(appoint => {
         if (appoint.type === 'free') {
@@ -123,10 +123,14 @@ const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     });
 });
 
+const formatToDate = (date) => {
+    const dateFormatted = date.split('-');
+    return new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]) + 1);
+}
+
 const bookAppointment = asyncHandler(async (req, res, next) => {
     const { date, time } = req.body;
-    const dateFormatted = date.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
@@ -142,10 +146,8 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
 
 const updateAppointment = asyncHandler(async (req, res, next) => {
     const { date, time, user_id, newDate, newTime, newUser } = req.body;
-    const dateFormatted = date.split('-');
-    const newDateFormatted = newDate.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
-    const newDate_ = new Date(parseInt(newDateFormatted[0]), parseInt(newDateFormatted[1]) - 1, parseInt(newDateFormatted[2]));
+    const date_ = formatToDate(date);
+    const newDate_ = formatToDate(newDate);
     const appointment = await Appointment.findOneAndUpdate({ user: user_id, time: time, date: date_ }, { user: newUser, time: newTime, date: newDate_ });
     res.status(200).json({
         success: true,
@@ -156,8 +158,7 @@ const updateAppointment = asyncHandler(async (req, res, next) => {
 
 const deleteAppointment = asyncHandler(async (req, res, next) => {
     const { date, time } = req.params;
-    const dateFormatted = date.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         res.status(400);
@@ -176,7 +177,7 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
 const addBreak = asyncHandler(async (req, res, next) => {
     const { date, time } = req.body;
     const dateFormatted = date.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
@@ -194,7 +195,7 @@ const addBreak = asyncHandler(async (req, res, next) => {
 const deleteBreak = asyncHandler(async (req, res, next) => {
     const { date, time } = req.params;
     const dateFormatted = date.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
@@ -212,7 +213,7 @@ const deleteBreak = asyncHandler(async (req, res, next) => {
 const updateBreak = asyncHandler(async (req, res, next) => {
     const { date, time, newTime } = req.body;
     const dateFormatted = date.split('-');
-    const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
+    const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });

@@ -1,10 +1,18 @@
 import Calendar from 'react-calendar';
 import '../Calendar.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppointmentButton from '../components/AppointmentButton';
 import Modal from '../components/Modal';
+import { useSelector, useDispatch } from 'react-redux';
+import Spinner from '../components/Spinner';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { getFreeDayAppointments, bookAppointment, reset } from '../features/day/daySlice';
 
 function Appointment() {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [date, setDate] = useState(new Date());
 
@@ -12,16 +20,32 @@ function Appointment() {
 
     const [isOpen, setIsOpen] = useState(false);
 
+    const { day, isLoading, isError, message, isSuccess } = useSelector(state => state.day);
 
-    const appointments = [
-        "10:00","11:00","12:00","13:00","14:00"
-    ];
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+    }, [isError, message]);
+
+    useEffect(() => {
+        dispatch(getFreeDayAppointments(formatUrlDate(date))).then(() => {
+            dispatch(reset());
+        });
+    },[date]);
 
     const formatDate = (date) => {
         const day = date.getDate();
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
+    }
+
+    const formatUrlDate = (date) => {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
     }
 
     Date.prototype.addDays = function(days) {
@@ -42,7 +66,14 @@ function Appointment() {
         }
     }
 
-    const bookAppointment = () => {
+    const toBookAppointment = () => {
+        dispatch(bookAppointment({date: formatUrlDate(date), time: timeSelected})).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                dispatch(reset());
+                toast.success('Appointment booked successfully');
+                navigate('/');
+            }
+        });
     }
 
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -52,20 +83,26 @@ function Appointment() {
         setTimeSelected(time);
     }
 
+    if (isLoading) {
+        return <Spinner />;
+    }
+
     return (
         <>
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={bookAppointment} title="Book Appointment" message={"Are you sure you want to book appointment?"}
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={toBookAppointment} title="Book Appointment" message={"Are you sure you want to book appointment?"}
         children={ <div>
-            <a>{`${formatDate(date)}`} {`${days[date.getDay()]}`} at {`${timeSelected}`}</a>
+            <h4>{`${formatDate(date)}`} {`${days[date.getDay()]}`} at {`${timeSelected}`}</h4>
         </div>} submitText="Book" cancelText={"Cancel"}/>
         <div className="login-container">
             <h1 style={{ marginBottom: '30px' }}>Book an Appointment</h1>
-            <Calendar calendarType="Hebrew" onChange={setDate}  tileDisabled={data => disableTile(data)}/>
+            <Calendar calendarType="Hebrew" onChange={setDate} defaultValue={date}  tileDisabled={data => disableTile(data)}/>
             <h4 style={{marginTop: '20px'}}>{formatDate(date)}</h4>
+            {day.appointments.length === 0 && <h4>No appointments available</h4>}
+                    {day.appointments.length > 0 && <h4>Appointments</h4>}
                 <div className='appointments-container'>
-                    {appointments.map((appointment, index) => {
+                    {day.appointments.length > 0 && (day.appointments.map((appointment, index) => {
                         return <AppointmentButton onClick={onSubmit} time={appointment} key={index}/>
-                    })}
+                    }))}
                 </div>
         </div>
         </>

@@ -491,7 +491,8 @@
   border-color: #A68B6A;
   transition: background-color 0.3s;
   transition: border-color 0.3s;
-  margin-right: 10px;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 #appointment-button:hover {

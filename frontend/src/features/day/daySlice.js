@@ -4,7 +4,7 @@ import dayService from "./dayService";
 
 const initialState = {
     day: {
-        date: new Date(),
+        date: "",
         appointments: []
     },
     appointments: [],
@@ -159,7 +159,7 @@ export const daySlice = createSlice({
         builder.addCase(bookAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: [],  date: new Date()};
+            state.day = {appointments: [],  date: ""};
         });
         builder.addCase(bookAppointment.rejected, (state, action) => {
             state.isLoading = false;
@@ -172,7 +172,7 @@ export const daySlice = createSlice({
         builder.addCase(getUserAppointments.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.appointments, date: new Date()};
+            state.day = {appointments: action.payload.appointments, date: ""};
         });
         builder.addCase(getUserAppointments.rejected, (state, action) => {
             state.isLoading = false;

@@ -2,20 +2,8 @@ import mongoose from "mongoose";
 
 
 const SettingsSchema = new mongoose.Schema({
-    site_header: {
-        type: String,
-        required: true,
-    },
-    site_title: {
-        type: String,
-        required: true,
-    },
     site_description: {
         type: String,
-    },
-    rtl: {
-        type: Boolean,
-        default: false,
     },
     register_code: {
         type: String,

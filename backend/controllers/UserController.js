@@ -3,6 +3,7 @@ import User from '../models/UserModel.js';
 import Settings from '../models/SettingsModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import e from 'express';
 
 
 const deselect = ['-password', "-OTP", "-__v", "-createdAt", "-updatedAt"];
@@ -20,10 +21,7 @@ const createSettings = async () => {
         scheduleDefault.push(scheduleDefaultDay);
     }
     var settings = await Settings.create({
-        site_header: "Appointment Site",
-        site_title: "Barber Name",
         site_description: "",
-        rtl: false,
         register_code: "123456",
         schedule: scheduleDefault
     });
@@ -103,25 +101,107 @@ const getUser = asyncHandler(async (req, res, next) => {
 
 const updateUser = asyncHandler(async (req, res, next) => {
     const { f_name, l_name, email, phone } = req.body;
-    const user = await User.findByIdAndUpdate(req.user.id, {
-        f_name,
-        l_name,
-        email,
-        phone
-    }, { new: true }).select(deselect);
-    res.status(200).json({
-        success: true,
-        user
-    });
+    const user = await User.findById(req.user.id).select(deselect);
+    if (!user.staff){
+        user.f_name = f_name;
+        user.l_name = l_name;
+        user.email = email;
+        user.phone = phone;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } else {
+        const { user_id } = req.body;
+        if (user_id){
+            const userToUpdate = await User.findById(user_id).select(deselect);
+            if (!userToUpdate) {
+                res.status(400)
+                throw new Error("User does not exist");
+            }
+            const { staff } = req.body;
+            userToUpdate.f_name = f_name;
+            userToUpdate.l_name = l_name;
+            userToUpdate.email = email;
+            userToUpdate.phone = phone;
+            userToUpdate.staff = staff;
+            await userToUpdate.save();
+            res.status(200).json({
+                success: true,
+                user: userToUpdate
+            });
+        } else {
+            user.f_name = f_name;
+            user.l_name = l_name;
+            user.email = email;
+            user.phone = phone;
+            await user.save();
+            res.status(200).json({
+                success: true,
+                user
+            });
+        }
+    }
 });
 
 const deleteUser = asyncHandler(async (req, res, next) => {
-    await User.findByIdAndDelete(req.user.id);
+    const user = await User.findById(req.user.id).select(deselect);
+    if (!user.staff){
+        res.status(401)
+        throw new Error("Not Authorized");
+    }
+    const { user_id } = req.body;
+    const userToDelete = await User.findByIdAndDelete(user_id).select(deselect);
     res.status(200).json({
         success: true,
-        message: "User deleted"
+        message: "User deleted",
+        user: userToDelete
+    });
+});
+
+const updateUserPassword = asyncHandler(async (req, res, next) => {
+    const { password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await User.findOne({ _id: req.user.id });
+    if (user.staff) {
+        const { user_id } = req.body;
+        if (user_id){
+            const newUser = await User.findById(user_id);
+            if (!newUser) {
+                res.status(400)
+                throw new Error("User does not exist");
+            }
+            newUser.password = hashedPassword;
+            await newUser.save();
+            res.status(200).json({
+                success: true,
+                user: newUser
+            });
+        } else {
+            user.password = hashedPassword;
+            res.status(200).json({
+            success: true,
+            user
+            });
+        }
+    } else {
+        user.password = hashedPassword;
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+});
+
+const getUsers = asyncHandler(async (req, res, next) => {
+    const users = await User.find({}).select(deselect);
+    res.status(200).json({
+        success: true,
+        users
     });
 });
 
 
-export { registerUser, loginUser, getUser, updateUser, deleteUser };
+export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers };

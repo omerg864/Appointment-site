@@ -15,10 +15,7 @@ const createSettings = async () => {
         scheduleDefault.push(scheduleDefaultDay);
     }
     var settings = await Settings.create({
-        site_header: "Appointment Site",
-        site_title: "Barber Name",
         site_description: "",
-        rtl: false,
         register_code: "123456",
         schedule: scheduleDefault
     });
@@ -34,10 +31,7 @@ const getSiteSettings = asyncHandler(async (req, res, next) => {
     res.status(200).json({
         success: true,
         settings: {
-            site_header: settings.site_header,
-            site_title: settings.site_title,
             site_description: settings.site_description,
-            rtl: settings.rtl,
         }
     });
 });
@@ -53,7 +47,23 @@ const getManagerSettings = asyncHandler(async (req, res, next) => {
     });
 });
 
+const updateSettings = asyncHandler(async (req, res, next) => {
+    const { site_description, register_code, schedule } = req.body;
+    var settings = await Settings.findOne();
+    if (!settings){
+        settings = await createSettings();
+    }
+    settings.site_description = site_description;
+    settings.register_code = register_code;
+    settings.schedule = schedule;
+    await settings.save();
+    res.status(200).json({
+        success: true,
+        settings
+    });
+});
 
 
 
-export { getSiteSettings, getManagerSettings };
+
+export { getSiteSettings, getManagerSettings, updateSettings };

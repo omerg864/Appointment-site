@@ -21,6 +21,11 @@ import ResetPassword from './pages/ResetPassword';
 import EmailResetPassword from './pages/EmailResetPassword';
 
 function App() {
+
+  if (process.env.REACT_APP_RTL === 'true') {
+    document.body.classList.add('rtl');
+  }
+  
   return (
     <div className="App">
       <ToastContainer theme="colored"/>

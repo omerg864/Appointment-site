@@ -39,7 +39,7 @@ function Header() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark header">
   <div className="container-fluid">
-    <a className="navbar-brand" style={{color: '#A68B6A'}} href="/">Appointments App</a>
+    <a className="navbar-brand" style={{color: '#A68B6A'}} href="/">{process.env.REACT_APP_SITE_HEADER}</a>
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span className="navbar-toggler-icon"></span>
     </button>

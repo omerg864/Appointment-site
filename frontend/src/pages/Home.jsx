@@ -16,7 +16,7 @@ function Home() {
 
   return (
     <>
-      <h1 className="title">Barber Name</h1>
+      <h1 className="title">{process.env.REACT_APP_SITE_TITLE}</h1>
       <div className="description">
         {!user ? 
         <p>

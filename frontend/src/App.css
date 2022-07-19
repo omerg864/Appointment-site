@@ -7,6 +7,10 @@
   background-color: #1a1918;
 }
 
+.rtl {
+  direction: rtl;
+}
+
 .footer {
   background-color: #1a1918;
   color: #A68B6A;

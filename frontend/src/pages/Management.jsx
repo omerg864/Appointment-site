@@ -130,8 +130,6 @@ function Management() {
             </div>
             <div className="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabIndex="0">
                 <h1 style={{marginBottom: '20px'}}>Settings</h1>
-                <FloatingLabelInput label={"Site Header"} props={{required: true, type: "text", name: "site_header"}} containerStyle={{marginBottom: '20px'}}/>
-                <FloatingLabelInput label={"Site Title"} props={{required: true, type: "text", name: "site_title"}} containerStyle={{marginBottom: '20px'}}/>
                 <FloatingLabelInput label={"Register Code"} props={{required: true, type: "text", name: "register_code", maxLength: '6'}} containerStyle={{marginBottom: '20px'}}/>
                 <FloatingLabelTextArea label={"Site Description"} props={{ name: "site_description"}} containerStyle={{marginBottom: '20px'}}/>
                 <div className='save-container'>

@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "toastify"
+      "reduxjs",
+      "toastify"
     ],
     "workbench.colorCustomizations": {
       "activityBar.activeBackground": "#353230",

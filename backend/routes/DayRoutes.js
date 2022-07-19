@@ -12,10 +12,10 @@ router.get('/getFreeDay/:date', protectUser, getFreeDayAppointments);
 router.post('/book', protectUser, bookAppointment);
 router.get('/getMyAppointments', protectUser, getUserAppointments);
 router.put('/updateAppointment', protectStaff, updateAppointment);
-router.delete('/deleteAppointment', protectUser, deleteAppointment);
+router.delete('/deleteAppointment/:date/:time', protectUser, deleteAppointment);
 router.post('/addBreak', protectStaff, addBreak);
-router.post('/updateBreak', protectStaff, updateBreak);
-router.post('/deleteBreak', protectStaff, deleteBreak);
+router.put('/updateBreak', protectStaff, updateBreak);
+router.delete('/deleteBreak/:date/:time', protectStaff, deleteBreak);
 
 
 export default router;

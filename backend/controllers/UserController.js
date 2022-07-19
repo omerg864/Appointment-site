@@ -110,7 +110,8 @@ const updateUser = asyncHandler(async (req, res, next) => {
         await user.save();
         res.status(200).json({
             success: true,
-            user
+            user,
+            staff: false
         });
     } else {
         const { user_id } = req.body;
@@ -129,7 +130,8 @@ const updateUser = asyncHandler(async (req, res, next) => {
             await userToUpdate.save();
             res.status(200).json({
                 success: true,
-                user: userToUpdate
+                user: userToUpdate,
+                staff: true
             });
         } else {
             user.f_name = f_name;
@@ -139,7 +141,8 @@ const updateUser = asyncHandler(async (req, res, next) => {
             await user.save();
             res.status(200).json({
                 success: true,
-                user
+                user,
+                staff: false
             });
         }
     }
@@ -151,7 +154,7 @@ const deleteUser = asyncHandler(async (req, res, next) => {
         res.status(401)
         throw new Error("Not Authorized");
     }
-    const { user_id } = req.body;
+    const { user_id } = req.params.id;
     const userToDelete = await User.findByIdAndDelete(user_id).select(deselect);
     res.status(200).json({
         success: true,

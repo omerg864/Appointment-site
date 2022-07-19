@@ -75,8 +75,7 @@ const calculateDay = (free_appointments, breaks, appointments, date) => {
     return schedule;
 }
 
-const getScheduleDay = async (req, res, next) => {
-    const dateFormatted = req.params.date.split('-');
+const getScheduleDay = async (req, res, next, dateFormatted) => {
     const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     var day = await Day.findOne({ date: date }).populate('appointments', ['date', 'user', 'time', '_id']);
     if (!day){
@@ -97,15 +96,20 @@ const getUserAppointments = asyncHandler(async (req, res, next) => {
 });
 
 const getDayAppointments = asyncHandler(async (req, res, next) => {
-    let schedule = await getScheduleDay(req, res, next);
+    const dateFormatted = req.params.date.split('-');
+    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     res.status(200).json({
         success: true,
-        schedule
+        day: schedule,
+        date
     });
 });
 
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
-    let schedule = await getScheduleDay(req, res, next);
+    const dateFormatted = req.params.date.split('-');
+    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    const date = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     let free_appointments = [];
     schedule.forEach(appoint => {
         if (appoint.type === 'free') {
@@ -114,7 +118,8 @@ const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     });
     res.status(200).json({
         success: true,
-        free_appointments
+        free_appointments,
+        date
     });
 });
 
@@ -144,12 +149,13 @@ const updateAppointment = asyncHandler(async (req, res, next) => {
     const appointment = await Appointment.findOneAndUpdate({ user: user_id, time: time, date: date_ }, { user: newUser, time: newTime, date: newDate_ });
     res.status(200).json({
         success: true,
-        appointment
+        appointment,
+        date: date_
     });
 });
 
 const deleteAppointment = asyncHandler(async (req, res, next) => {
-    const { date, time } = req.body;
+    const { date, time } = req.params;
     const dateFormatted = date.split('-');
     const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
@@ -162,7 +168,8 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
     await day.save();
     res.status(200).json({
         success: true,
-        appointment
+        appointment,
+        date: date_
     });
 });
 
@@ -176,14 +183,16 @@ const addBreak = asyncHandler(async (req, res, next) => {
     }
     day.breaks.push(time);
     await day.save();
+    let schedule = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
-        day
+        day: schedule,
+        date: date_
     });
 });
 
 const deleteBreak = asyncHandler(async (req, res, next) => {
-    const { date, time } = req.body;
+    const { date, time } = req.params;
     const dateFormatted = date.split('-');
     const date_ = new Date(parseInt(dateFormatted[0]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[2]));
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
@@ -192,9 +201,11 @@ const deleteBreak = asyncHandler(async (req, res, next) => {
     }
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     await day.save();
+    let schedule = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
-        day
+        day: schedule,
+        date: date_
     });
 });
 
@@ -209,9 +220,11 @@ const updateBreak = asyncHandler(async (req, res, next) => {
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     day.breaks.push(newTime);
     await day.save();
+    let schedule = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
-        day
+        day: schedule,
+        date: date_
     });
 });
 

@@ -7,6 +7,7 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = {
     user: user ? user : null ,
+    users: [],
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -39,6 +40,61 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
         await authService.logout();
     }
     catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const getUser = createAsyncThunk("auth/getUser", async (_, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.getUser(token);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const updateUser = createAsyncThunk("auth/updateUser", async (user, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.updateUser(token, user);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const deleteUser = createAsyncThunk("auth/deleteUser", async (id, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.deleteUser(token, id);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const updateUserPassword = createAsyncThunk("auth/updateUserPassword", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.updateUserPassword(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const getUsers = createAsyncThunk("auth/getUsers", async (_, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.getUsers(token);
+        return response.data;
+    }catch(error){
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
         return thunkAPI.rejectWithValue({message});
     }
@@ -94,6 +150,75 @@ export const authSlice = createSlice({
             state.user = null;
         });
         builder.addCase(logout.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(getUser.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.user = action.payload.user;
+        });
+        builder.addCase(getUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(updateUser.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(updateUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            if (action.payload.staff) {
+                state.users = state.users.filter(user => user.id !== action.payload.user.id).push(action.payload.user);
+            } else {
+                state.user = action.payload.user;
+                localStorage.setItem("user", JSON.stringify(action.payload.user));
+            }
+        });
+        builder.addCase(updateUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(deleteUser.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(deleteUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.users = state.users.filter(user => user.id !== action.payload.user.id);
+        });
+        builder.addCase(deleteUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(updateUserPassword.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(updateUserPassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+        });
+        builder.addCase(updateUserPassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(getUsers.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getUsers.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.users = action.payload.users;
+        });
+        builder.addCase(getUsers.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.message = action.payload.message;

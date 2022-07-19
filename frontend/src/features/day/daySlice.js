@@ -4,18 +4,109 @@ import dayService from "./dayService";
 
 const initialState = {
     day: {
-        date: "",
+        date: new Date(),
         appointments: []
     },
+    appointments: [],
     isError: false,
     isSuccess: false,
     isLoading: false,
     message: ""
 };
 
-export const register = createAsyncThunk("day/get", async (date, thunkAPI) => {
+export const getDayAppointments = createAsyncThunk("day/getDayAppointments", async (date, thunkAPI) => {
     try{
-        const response =  await dayService.getDay(date);
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.getDayAppointments(token, date);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const getFreeDayAppointments = createAsyncThunk("day/getFreeDayAppointments", async (date, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.getFreeDayAppointments(token, date);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const bookAppointment = createAsyncThunk("day/bookAppointment", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.bookAppointment(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const getUserAppointments = createAsyncThunk("day/getUserAppointments", async (_, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.getUserAppointments(token);
+        return response.data;
+    }
+    catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const updateAppointment = createAsyncThunk("day/updateAppointment", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.updateAppointment(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const deleteAppointment = createAsyncThunk("day/deleteAppointment", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.deleteAppointment(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const addBreak = createAsyncThunk("day/addBreak", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.addBreak(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const updateBreak = createAsyncThunk("day/updateBreak", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.updateBreak(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const deleteBreak = createAsyncThunk("day/deleteBreak", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.deleteBreak(token, data);
         return response.data;
     }catch(error){
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
@@ -36,15 +127,119 @@ export const daySlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(register.pending, (state, action) => {
+        builder.addCase(getDayAppointments.pending, (state, action) => {
             state.isLoading = true;
         });
-        builder.addCase(register.fulfilled, (state, action) => {
+        builder.addCase(getDayAppointments.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = action.payload.day;
+            state.day = {appointments: action.payload.day,  date: action.payload.date};
         });
-        builder.addCase(register.rejected, (state, action) => {
+        builder.addCase(getDayAppointments.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(getFreeDayAppointments.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getFreeDayAppointments.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.free_appointments,  date: action.payload.date};
+        });
+        builder.addCase(getFreeDayAppointments.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(bookAppointment.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(bookAppointment.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: [],  date: new Date()};
+        });
+        builder.addCase(bookAppointment.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(getUserAppointments.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(getUserAppointments.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.appointments, date: new Date()};
+        });
+        builder.addCase(getUserAppointments.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(updateAppointment.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(updateAppointment.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: state.day.appointments.filter(appoint => appoint._id.toString() !== action.payload.appointment._id.toString()).push(action.payload.appointment), date: action.payload.date};
+        });
+        builder.addCase(updateAppointment.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(deleteAppointment.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(deleteAppointment.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: state.day.appointments.filter(appoint => appoint._id.toString() !== action.payload.appointment._id.toString()), date: action.payload.date};
+        });
+        builder.addCase(deleteAppointment.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(addBreak.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(addBreak.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date};
+        });
+        builder.addCase(addBreak.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(updateBreak.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(updateBreak.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date};
+        });
+        builder.addCase(updateBreak.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(deleteBreak.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(deleteBreak.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date};
+        });
+        builder.addCase(deleteBreak.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.message = action.payload.message;

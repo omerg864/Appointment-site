@@ -4,13 +4,61 @@ import {toast} from 'react-toastify';
 const API_URL = '/api/v1/days/';
 
 
-const getDay = async (date) => {
-    const response = await axios.get(API_URL + 'get/' + date);
+const getDayAppointments = async (token, date) => {
+    const response = await axios.get(API_URL + 'getDay/' + date, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const getFreeDayAppointments = async (token, date) => {
+    const response = await axios.get(API_URL + 'getFreeDay/' + date, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const bookAppointment = async (token, data) => {
+    const response = await axios.post(API_URL + 'book', data, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const getUserAppointments = async (token) => {
+    const response = await axios.get(API_URL + 'getMyAppointments', {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const updateAppointment = async (token, data) => {
+    const response = await axios.put(API_URL + 'updateAppointment', data, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const deleteAppointment = async (token, data) => {
+    const response = await axios.delete(API_URL + 'deleteAppointment' + `/${data.date}/${data.time}`, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const addBreak = async (token, data) => {
+    const response = await axios.post(API_URL + 'addBreak', data, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const updateBreak = async (token, data) => {
+    const response = await axios.put(API_URL + 'updateBreak', data, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const deleteBreak = async (token, data) => {
+    const response = await axios.delete(API_URL + 'deleteBreak' + `/${data.date}/${data.time}`, {headers: {Authorization: `Bearer ${token}`}});
     return response;
 }
 
 const dayService = {
-    getDay
+    getDayAppointments,
+    getFreeDayAppointments,
+    bookAppointment,
+    getUserAppointments,
+    updateAppointment,
+    deleteAppointment,
+    addBreak,
+    updateBreak,
+    deleteBreak
 }
 
 export default dayService;

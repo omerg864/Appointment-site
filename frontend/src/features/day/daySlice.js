@@ -16,7 +16,7 @@ const initialState = {
 
 export const getDayAppointments = createAsyncThunk("day/getDayAppointments", async (date, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.getDayAppointments(token, date);
         return response.data;
     }catch(error){
@@ -27,7 +27,7 @@ export const getDayAppointments = createAsyncThunk("day/getDayAppointments", asy
 
 export const getFreeDayAppointments = createAsyncThunk("day/getFreeDayAppointments", async (date, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.getFreeDayAppointments(token, date);
         return response.data;
     }catch(error){
@@ -38,7 +38,7 @@ export const getFreeDayAppointments = createAsyncThunk("day/getFreeDayAppointmen
 
 export const bookAppointment = createAsyncThunk("day/bookAppointment", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.bookAppointment(token, data);
         return response.data;
     }catch(error){
@@ -49,7 +49,7 @@ export const bookAppointment = createAsyncThunk("day/bookAppointment", async (da
 
 export const getUserAppointments = createAsyncThunk("day/getUserAppointments", async (_, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.getUserAppointments(token);
         return response.data;
     }
@@ -61,7 +61,7 @@ export const getUserAppointments = createAsyncThunk("day/getUserAppointments", a
 
 export const updateAppointment = createAsyncThunk("day/updateAppointment", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.updateAppointment(token, data);
         return response.data;
     }catch(error){
@@ -72,7 +72,7 @@ export const updateAppointment = createAsyncThunk("day/updateAppointment", async
 
 export const deleteAppointment = createAsyncThunk("day/deleteAppointment", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.deleteAppointment(token, data);
         return response.data;
     }catch(error){
@@ -83,7 +83,7 @@ export const deleteAppointment = createAsyncThunk("day/deleteAppointment", async
 
 export const addBreak = createAsyncThunk("day/addBreak", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.addBreak(token, data);
         return response.data;
     }catch(error){
@@ -94,7 +94,7 @@ export const addBreak = createAsyncThunk("day/addBreak", async (data, thunkAPI) 
 
 export const updateBreak = createAsyncThunk("day/updateBreak", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.updateBreak(token, data);
         return response.data;
     }catch(error){
@@ -105,7 +105,7 @@ export const updateBreak = createAsyncThunk("day/updateBreak", async (data, thun
 
 export const deleteBreak = createAsyncThunk("day/deleteBreak", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await dayService.deleteBreak(token, data);
         return response.data;
     }catch(error){

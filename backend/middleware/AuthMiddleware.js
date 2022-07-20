@@ -10,6 +10,7 @@ const protectUser = asyncHandler(async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = await User.findById(decoded.id).select('-password');
+            req.token = token;
             next();
         } catch(error){
             console.log(error);
@@ -36,6 +37,7 @@ const protectStaff = asyncHandler(async (req, res, next) => {
                 throw new Error('Not authorized');
             }
             req.user = user;
+            req.token = token;
             next();
         } catch(error){
             console.log(error);

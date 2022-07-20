@@ -17,7 +17,7 @@ const initialState = {
 
 export const getSiteSettings = createAsyncThunk("settings/getSiteSettings", async (_, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await settingsService.getSiteSettings(token);
         return response.data;
     }
@@ -30,7 +30,7 @@ export const getSiteSettings = createAsyncThunk("settings/getSiteSettings", asyn
 
 export const getManagerSettings = createAsyncThunk("settings/getManagerSettings", async (_, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await settingsService.getManagerSettings(token);
         return response.data;
     }
@@ -43,7 +43,7 @@ export const getManagerSettings = createAsyncThunk("settings/getManagerSettings"
 
 export const updateSettings = createAsyncThunk("settings/updateSettings", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await settingsService.updateSettings(token, data);
         return response.data;
     }

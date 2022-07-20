@@ -79,7 +79,6 @@ const loginUser = asyncHandler(async (req, res, next) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.status(200).json({
         success: true,
-        token,
         user: {
             id: user._id,
             f_name: user.f_name,
@@ -87,6 +86,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
             email: user.email,
             phone: user.phone,
             staff: user.staff,
+            token,
         }
     });
 });
@@ -110,7 +110,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
         await user.save();
         res.status(200).json({
             success: true,
-            user,
+            user: {...user._doc , token: req.token},
             staff: false
         });
     } else {
@@ -128,9 +128,10 @@ const updateUser = asyncHandler(async (req, res, next) => {
             userToUpdate.phone = phone;
             userToUpdate.staff = staff;
             await userToUpdate.save();
+            const token = jwt.sign({ id: userToUpdate._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
             res.status(200).json({
                 success: true,
-                user: userToUpdate,
+                user: {...userToUpdate._doc, token},
                 staff: true
             });
         } else {
@@ -141,7 +142,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
             await user.save();
             res.status(200).json({
                 success: true,
-                user,
+                user: {...user._doc, token: req.token},
                 staff: false
             });
         }

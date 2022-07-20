@@ -58,7 +58,7 @@ function Appointment() {
     const disableTile = data => {
         var today = new Date();
         today = today.addDays(-1);
-        var month = today.addDays(31);
+        var month = today.addDays(10);
         if (today > data.date || month < data.date) {
             return true;
         } else {

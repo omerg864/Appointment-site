@@ -7,7 +7,6 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = {
     user: user ? user : null ,
-    token: "",
     users: [],
     isError: false,
     isSuccess: false,
@@ -48,7 +47,7 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
 
 export const getUser = createAsyncThunk("auth/getUser", async (_, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await authService.getUser(token);
         return response.data;
     }catch(error){
@@ -59,7 +58,7 @@ export const getUser = createAsyncThunk("auth/getUser", async (_, thunkAPI) => {
 
 export const updateUser = createAsyncThunk("auth/updateUser", async (user, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await authService.updateUser(token, user);
         return response.data;
     }catch(error){
@@ -70,7 +69,7 @@ export const updateUser = createAsyncThunk("auth/updateUser", async (user, thunk
 
 export const deleteUser = createAsyncThunk("auth/deleteUser", async (id, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await authService.deleteUser(token, id);
         return response.data;
     }catch(error){
@@ -81,7 +80,7 @@ export const deleteUser = createAsyncThunk("auth/deleteUser", async (id, thunkAP
 
 export const updateUserPassword = createAsyncThunk("auth/updateUserPassword", async (data, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await authService.updateUserPassword(token, data);
         return response.data;
     }catch(error){
@@ -92,7 +91,7 @@ export const updateUserPassword = createAsyncThunk("auth/updateUserPassword", as
 
 export const getUsers = createAsyncThunk("auth/getUsers", async (_, thunkAPI) => {
     try{
-        const token = thunkAPI.getState().auth.token;
+        const token = thunkAPI.getState().auth.user.token;
         const response =  await authService.getUsers(token);
         return response.data;
     }catch(error){
@@ -135,7 +134,6 @@ export const authSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             state.user = action.payload.user;
-            state.token = action.payload.token;
             localStorage.setItem("user", JSON.stringify(action.payload.user));
         });
         builder.addCase(login.rejected, (state, action) => {
@@ -150,7 +148,6 @@ export const authSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             state.user = null;
-            state.token = "";
         });
         builder.addCase(logout.rejected, (state, action) => {
             state.isLoading = false;

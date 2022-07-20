@@ -88,7 +88,7 @@ const getScheduleDay = async (req, res, next, dateFormatted) => {
 }
 
 const getUserAppointments = asyncHandler(async (req, res, next) => {
-    var appointments = await Appointment.find({ user: req.user._id }).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    var appointments = await Appointment.find({ user: req.user._id }).sort({date: 1, time: 1}).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
     res.status(200).json({
         success: true,
         appointments

@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppointmentView from "../components/AppointmentView";
 import Modal from "../components/Modal";
-import { getUserAppointments, reset } from '../features/day/daySlice';
+import { getUserAppointments, reset, deleteAppointment } from '../features/day/daySlice';
+import { updateUser, reset as userReset } from '../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from "../components/Spinner";
 import { toast } from 'react-toastify';
@@ -15,20 +16,20 @@ function Profile() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const user = useSelector(state => state.auth.user);
+  const auth = useSelector(state => state.auth);
 
-  const { day, isLoading, isError, message, isSuccess } = useSelector(state => state.day);
+  const { appointments, isLoading, isError, message, isSuccess } = useSelector(state => state.day);
 
   const [formData, setFormData] = useState({
-    f_name: user.f_name,
-    l_name: user.l_name,
-    email: user.email,
-    phone: user.phone,
+    f_name: auth.user.f_name,
+    l_name: auth.user.l_name,
+    email: auth.user.email,
+    phone: auth.user.phone,
   });
 
   const [isOpen, setIsOpen] = useState(false);
   const [appointmentSelected, setAppointmentSelected] = useState({
-    date: new Date(),
+    date: "2020-01-01T00:00:00.000Z",
     time: "",
     id: "",
   });
@@ -37,7 +38,10 @@ function Profile() {
     if (isError) {
       toast.error(message);
     }
-  }, [isError, message]);
+    if (auth.isError){
+      toast.error(auth.message);
+    }
+  }, [isError, message, auth.isError, auth.message]);
 
   useEffect(() => {
     dispatch(getUserAppointments()).then(() => {
@@ -50,7 +54,12 @@ function Profile() {
   }
 
   const saveProfile = () => {
-    console.log(formData);
+    dispatch(updateUser(formData)).then((response) => {
+      dispatch(userReset());
+      if (response.meta.requestStatus === 'fulfilled') {
+        toast.success("Profile updated successfully");
+      }
+    });
   }
 
   Date.prototype.addDays = function(days) {
@@ -60,14 +69,15 @@ function Profile() {
 }
 
   const cancelAppointmentModal = (appointment) => {
-    console.log(appointment);
     setIsOpen(true);
     setAppointmentSelected(appointment);
   }
 
   const cancelAppointment = () => {
-    console.log(appointmentSelected);
-    setIsOpen(false);
+    dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentSelected.date)), time: appointmentSelected.time})).then(() => {
+      dispatch(reset());
+      setIsOpen(false);
+    });
   }
 
   
@@ -78,9 +88,22 @@ function Profile() {
     return `${day}/${month}/${year}`;
   }
 
+  const formatUrlDate = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
+  const toDate = (date) => {
+    var dateSplit = date.split("T")[0].split("-");
+    var formattedDate = new Date(parseInt(dateSplit[0]), parseInt(dateSplit[1]) - 1, parseInt(dateSplit[2]));
+    return formattedDate;
+}
+
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  if (isLoading) {
+  if (isLoading || auth.isLoading) {
     return <Spinner />;
   }
 
@@ -88,7 +111,7 @@ function Profile() {
     <>
     <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={cancelAppointment} title="Cancel Appointment" message={"Are you sure you want to cancel this appointment?"}
         children={ <div>
-            <a>{`${formatDate(appointmentSelected.date)}`} {`${days[appointmentSelected.date.getDay()]}`} at {`${appointmentSelected.time}`}</a>
+            <a>{`${formatDate(toDate(appointmentSelected.date))}`} {`${days[toDate(appointmentSelected.date).getDay()]}`} at {`${appointmentSelected.time}`}</a>
         </div>} submitText="Cancel Appointment" cancelText={"Close"}/>
     <div className="management-container">
       <ul className="nav nav-tabs" id="myTab" role="tablist">
@@ -103,7 +126,7 @@ function Profile() {
         <div className="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabIndex="0">
         <h1>Appointments</h1>
         <div className="appointments-container">
-            {day.appointments.map((appointment, index) => {
+            {appointments.map((appointment, index) => {
               return (
                 <AppointmentView key={index} data={appointment} onClick={cancelAppointmentModal} />
               );

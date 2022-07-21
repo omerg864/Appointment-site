@@ -8,6 +8,7 @@ import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { getFreeDayAppointments, bookAppointment, reset } from '../features/day/daySlice';
+import { formatUrlDate, formatDate } from '../functions/dateFunctions';
 
 function Appointment() {
 
@@ -33,20 +34,6 @@ function Appointment() {
             dispatch(reset());
         });
     },[date]);
-
-    const formatDate = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
-
-    const formatUrlDate = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-    }
 
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());

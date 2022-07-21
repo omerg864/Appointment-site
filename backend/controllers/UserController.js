@@ -3,8 +3,6 @@ import User from '../models/UserModel.js';
 import Settings from '../models/SettingsModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import e from 'express';
-
 
 const deselect = ['-password', "-OTP", "-__v", "-createdAt", "-updatedAt"];
 
@@ -181,20 +179,19 @@ const updateUserPassword = asyncHandler(async (req, res, next) => {
             await newUser.save();
             res.status(200).json({
                 success: true,
-                user: newUser
             });
         } else {
             user.password = hashedPassword;
+            await user.save();
             res.status(200).json({
             success: true,
-            user
             });
         }
     } else {
         user.password = hashedPassword;
+        await user.save();
         res.status(200).json({
             success: true,
-            user
         });
     }
 });

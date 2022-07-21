@@ -8,6 +8,7 @@ import { updateUser, reset as userReset } from '../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from "../components/Spinner";
 import { toast } from 'react-toastify';
+import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
 
 
 
@@ -79,27 +80,6 @@ function Profile() {
       setIsOpen(false);
     });
   }
-
-  
-  const formatDate = (date) => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-
-  const formatUrlDate = (date) => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-}
-
-  const toDate = (date) => {
-    var dateSplit = date.split("T")[0].split("-");
-    var formattedDate = new Date(parseInt(dateSplit[0]), parseInt(dateSplit[1]) - 1, parseInt(dateSplit[2]));
-    return formattedDate;
-}
 
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 

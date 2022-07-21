@@ -46,9 +46,9 @@ function Home() {
           <button className="btn btn-light" style={{width: '60%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
           </div>)}
       </div>
-      {settings.site_description.length > 0 && 
+      {user && settings.site_description.length > 0 && 
       <div className="message">
-        <p>
+        <p className='site_description'>
           {settings.site_description}
         </p>
       </div>}

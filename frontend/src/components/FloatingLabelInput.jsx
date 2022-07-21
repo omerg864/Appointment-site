@@ -1,5 +1,5 @@
 import { useState } from 'react';
-function FloatingLabelInput({label, value, setValue, obj, props, containerStyle, containerProps}) {
+function FloatingLabelInput({label, value, setValue, obj, indexed, props, containerStyle, containerProps}) {
 
     var input_class = '';
     if (value !== "" && value !== undefined){
@@ -15,10 +15,15 @@ function FloatingLabelInput({label, value, setValue, obj, props, containerStyle,
         })
     });
     const OnChange = (e) => {
-        if (obj){
-            setValue({...obj, [e.target.name]: e.target.value});
+        if (indexed !== undefined) {
+            console.log(indexed);
+            setValue(e.target.name, e.target.value, indexed);
         } else {
-            setValue(e.target.value);
+            if (obj){
+                setValue({...obj, [e.target.name]: e.target.value});
+            } else {
+                setValue(e.target.value);
+            }
         }
     }
 return (

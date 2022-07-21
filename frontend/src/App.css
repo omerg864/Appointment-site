@@ -626,3 +626,8 @@
 .active-btn-icon {
   background-color: rgba(255, 255, 255, 0.911);
 }
+
+.site_description {
+  word-wrap: break-word;
+  white-space: pre-line;
+}

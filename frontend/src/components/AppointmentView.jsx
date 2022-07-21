@@ -1,4 +1,5 @@
 import { MdOutlineClose } from 'react-icons/md';
+import { toDate } from '../functions/dateFunctions';
 
 
 function AppointmentView({ data, onClick }) {
@@ -14,12 +15,6 @@ function AppointmentView({ data, onClick }) {
       var date = new Date(this.valueOf());
       date.setDate(date.getDate() + days);
       return date;
-    }
-
-    const toDate = (date) => {
-        var dateSplit = date.split("T")[0].split("-");
-        var formattedDate = new Date(parseInt(dateSplit[0]), parseInt(dateSplit[1]) - 1, parseInt(dateSplit[2]));
-        return formattedDate;
     }
 
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

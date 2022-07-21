@@ -10,7 +10,7 @@ router.get('/get', protectUser, getUser);
 router.put('/updateUser', protectUser, updateUser);
 router.delete('/deleteUser/:id', protectStaff, deleteUser);
 router.put('/updatePassword', protectUser, updateUserPassword);
-router.put('/getUsers', protectStaff, getUsers);
+router.get('/getUsers', protectStaff, getUsers);
 
 
 export default router;

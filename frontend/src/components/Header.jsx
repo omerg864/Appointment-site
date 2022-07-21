@@ -26,6 +26,22 @@ function Header() {
         navigate('/profile');
     }
 
+    const gotoUsers = () => {
+        navigate('/users');
+    }
+
+    const gotoSettings = () => {
+        navigate('/settings');
+    }
+
+    const gotoSchedule = () => {
+        navigate('/schedule');
+    }
+
+    const gotoAppointments = () => {
+        navigate('/appointments');
+    }
+
     const logoutUser = () => {
         dispatch(logout()).then((response) => {
             if (response.meta.requestStatus === "fulfilled") {
@@ -58,9 +74,20 @@ function Header() {
             ) : (
                 <ul className="navbar-nav nav-buttons">
                 {user.staff && (
+                    <>
                     <li className='nav-item'>
-                        <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoManagement}>Manage</button>
+                        <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoAppointments}>Appointments</button>
                     </li>
+                    <li className='nav-item'>
+                        <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoSchedule}>Schedule</button>
+                    </li>
+                    <li className='nav-item'>
+                        <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoUsers}>Users</button>
+                    </li>
+                    <li className='nav-item'>
+                        <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoSettings}>Settings</button>
+                    </li>
+                    </>
                 )}
                 <li className='nav-item'>
                     <button className="btn btn-outline-light left-btn" id="button-outline-header" onClick={gotoProfile}>Profile</button>

@@ -1,13 +1,17 @@
 import $ from 'jquery';
 
 
-function TagsInput({ values,  setValues, containerStyles, label, props}) {
+function TagsInput({ values,  setValues, index, containerStyles, label, props}) {
+
+    var idIndex = index !== undefined ? index : "";
+
+    var active = values ? "label-active" : "";
 
     $(function() {
-    const tagInput = document.querySelector(".tag-input");
-    const tagArea = document.querySelector(".tag-area");
-    const ul = document.querySelector(".tag-area ul");
-    const label = document.querySelector(".tag-label");
+    const tagInput = document.querySelector(`#tag-input-${idIndex}`);
+    const tagArea = document.querySelector(`#tag-area-${idIndex}`);
+    const ul = document.querySelector(`#tag-ul-${idIndex}`);
+    const label = document.querySelector(`#tag-label-${idIndex}`);
     
     let tags = values || [];
 
@@ -92,10 +96,10 @@ function TagsInput({ values,  setValues, containerStyles, label, props}) {
 });
 
   return (
-    <div className="tag-area" style={containerStyles}>
-        <label htmlFor="tag-input" className="tag-label">{label}</label>
-        <ul className='ul-tag'>
-            <input {...props} type="text" className="tag-input" id="tag-input" />
+    <div className="tag-area" id={`tag-area-${idIndex}`} style={containerStyles}>
+        <label htmlFor={`tag-input-${idIndex}`} id={`tag-label-${idIndex}`} className={`tag-label ${active}`}>{label}</label>
+        <ul className='ul-tag' id={`tag-ul-${idIndex}`}>
+            <input {...props} type="text" className="tag-input" id={`tag-input-${idIndex}`} />
         </ul>
     </div>
   )

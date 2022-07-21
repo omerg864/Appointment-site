@@ -16,9 +16,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Appointment from './pages/Appointment';
 import Profile from './pages/Profile';
-import Management from './pages/Management';
 import ResetPassword from './pages/ResetPassword';
 import EmailResetPassword from './pages/EmailResetPassword';
+import Users from './pages/Users';
+import Settings from './pages/Settings';
+import Schedule from './pages/Schedule';
+import Appointments from './pages/Appointments';
 
 function App() {
 
@@ -38,9 +41,12 @@ function App() {
       <Route path="/register" element={<Register/>} />
       <Route path="/appointment" element={<Appointment/>} />
       <Route path="/profile" element={<Profile/>} />
-      <Route path="/manage" element={<Management/>} />
       <Route path="/resetPassword" element={<ResetPassword/>} />
       <Route path="/forgot" element={<EmailResetPassword/>} />
+      <Route path="/users" element={<Users/>} />
+      <Route path="/settings" element={<Settings/>} />
+      <Route path="/schedule" element={<Schedule/>} />
+      <Route path="/appointments" element={<Appointments/>} />
       </Routes>
       </div>
       <Footer />

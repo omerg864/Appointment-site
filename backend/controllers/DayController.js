@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Day from '../models/DayModel.js';
 import Appointment from '../models/AppointmentModel.js';
+import User from '../models/UserModel.js';
 
 
 
@@ -8,7 +9,7 @@ const checkAppointments = (appointments, time) => {
     let returnValue = [];
     for (let i = 0; i < appointments.length; i++) {
         if (appointments[i].time === time) {
-            returnValue.push(appointments[i]);
+            returnValue.push({...appointments[i]._doc, type: 'appointment'});
         }
     }
     return returnValue;
@@ -129,13 +130,18 @@ const formatToDate = (date) => {
 }
 
 const bookAppointment = asyncHandler(async (req, res, next) => {
-    const { date, time } = req.body;
+    const { date, time, staff, user_id } = req.body;
     const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
         day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
     }
-    const appointment = await (await Appointment.create({ user: req.user.id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    var appointment = ""
+    if (staff && req.user.staff) {
+        appointment = await (await Appointment.create({ user: user_id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    }else{
+        appointment = await (await Appointment.create({ user: req.user.id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    }
     day.appointments.push(appointment._id);
     await day.save();
     res.status(200).json({
@@ -148,10 +154,19 @@ const updateAppointment = asyncHandler(async (req, res, next) => {
     const { date, time, user_id, newDate, newTime, newUser } = req.body;
     const date_ = formatToDate(date);
     const newDate_ = formatToDate(newDate);
-    const appointment = await Appointment.findOneAndUpdate({ user: user_id, time: time, date: date_ }, { user: newUser, time: newTime, date: newDate_ });
+    const findNewUser = await User.findOne({ _id: newUser });
+    if (!findNewUser){
+        res.status(400);
+        throw new Error('User not found');
+    }
+    const appointment = await Appointment.findOneAndUpdate({ time: time, date: date_ }, { user: findNewUser, time: newTime, date: newDate_ }, { new: true })
+    .populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
     res.status(200).json({
         success: true,
-        appointment,
+        appointment: {
+            ...appointment._doc,
+            type: 'appointment'
+        },
         date: date_
     });
 });
@@ -164,7 +179,7 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
         res.status(400);
         throw new Error('Appointment not found');
     }
-    const appointment = await Appointment.findOneAndDelete({ user: req.user.id, time: time, date: date_ });
+    const appointment = await Appointment.findOneAndDelete({ time: time, date: date_ });
     day.appointments = day.appointments.filter(appoint => appoint._id.toString() !== appointment._id.toString());
     await day.save();
     res.status(200).json({

@@ -132,7 +132,6 @@ export const daySlice = createSlice({
         });
         builder.addCase(getDayAppointments.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isSuccess = true;
             state.day = {appointments: action.payload.day,  date: action.payload.date};
         });
         builder.addCase(getDayAppointments.rejected, (state, action) => {
@@ -159,7 +158,6 @@ export const daySlice = createSlice({
         builder.addCase(bookAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: [],  date: ""};
         });
         builder.addCase(bookAppointment.rejected, (state, action) => {
             state.isLoading = false;
@@ -185,7 +183,14 @@ export const daySlice = createSlice({
         builder.addCase(updateAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: state.day.appointments.filter(appoint => appoint._id.toString() !== action.payload.appointment._id.toString()).push(action.payload.appointment), date: action.payload.date};
+            state.day = {appointments: state.day.appointments.map(appoint => {
+                if (appoint.type === 'appointment' && appoint._id === action.payload.appointment._id) {
+                    console.log("in");
+                    return action.payload.appointment;
+                } else {
+                    return appoint;
+                }
+            }), date: action.payload.date};
         });
         builder.addCase(updateAppointment.rejected, (state, action) => {
             state.isLoading = false;
@@ -198,8 +203,6 @@ export const daySlice = createSlice({
         builder.addCase(deleteAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: state.day.appointments.filter(appoint => appoint._id.toString() !== action.payload.appointment._id.toString()), date: action.payload.date};
-            state.appointments = state.appointments.filter(appoint => appoint._id.toString() !== action.payload.appointment._id.toString());
         });
         builder.addCase(deleteAppointment.rejected, (state, action) => {
             state.isLoading = false;

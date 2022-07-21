@@ -27,7 +27,7 @@ const createSettings = async () => {
 }
 
 const registerUser = asyncHandler(async (req, res, next) => {
-    const { f_name, l_name, email, phone, password, registerCode } = req.body;
+    const { f_name, l_name, email, phone, password, register_code } = req.body;
     const user = await User.findOne({ "email" : { $regex : new RegExp(email, "i") } });
     if (user) {
         res.status(400)
@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     if (!settings){
         settings = await createSettings();
     }
-    if (settings.register_code !== registerCode) {
+    if (settings.register_code !== register_code) {
         res.status(401)
         throw new Error("Invalid register code. can't register");
     }

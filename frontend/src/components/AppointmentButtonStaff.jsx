@@ -3,7 +3,7 @@ import { MdEdit } from 'react-icons/md';
 
 function AppointmentButtonStaff({ appointment, onClick }) {
   return (
-    <div className={`btn-container ${appointment.type === 'free' && 'free-btn'} ${appointment.type === 'break' && 'break-btn'} ${!appointment.type && 'taken-btn'} `}>
+    <div className={`btn-container ${appointment.type === 'free' && 'free-btn'} ${appointment.type === 'break' && 'break-btn'} ${appointment.type === 'appointment' && 'taken-btn'} `}>
         {appointment.type === 'free' ? <span style={{fontSize: '20px', marginBottom: '6px'}}>{appointment.time}</span> :<span className="time-title">{appointment.time}</span>}
         {appointment.user && (
             <div className='user-title-div'>

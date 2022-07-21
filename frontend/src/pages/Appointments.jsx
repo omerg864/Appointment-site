@@ -3,20 +3,16 @@ import '../Calendar.css';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import FloatingLabelInput from '../components/FloatingLabelInput';
-import ScheduleDay from '../components/ScheduleDay';
 import AppointmentButtonStaff from '../components/AppointmentButtonStaff';
-import FloatingLabelTextArea from '../components/FloatingLabelTextArea';
-import UserInfo from '../components/UserInfo';
 import Modal from '../components/Modal';
 import $ from 'jquery';
 import UserDisplay from '../components/UserDisplay';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
-import { getDayAppointments, reset } from '../features/day/daySlice';
+import { getDayAppointments, reset, deleteAppointment, addBreak, updateAppointment, bookAppointment, deleteBreak } from '../features/day/daySlice';
 import { getUsers, reset as userReset } from '../features/auth/authSlice';
 import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
-import { getManagerSettings, reset as settingsReset, updateSettings } from '../features/settings/settingsSlice';
 
 function Appointments() {
 
@@ -65,6 +61,12 @@ function Appointments() {
     }, [date]);
 
     useEffect(() => {
+        dispatch(getDayAppointments(formatUrlDate(date))).then(() => {
+            dispatch(reset());
+        });
+    }, [isSuccess]);
+
+    useEffect(() => {
         if (isError){
             toast.error(message);
         }
@@ -84,7 +86,78 @@ function Appointments() {
     }
 
     const editAppointment = () => {
-
+        console.log(radioValue);
+        if(radioValue === 'option1'){
+            if (appointmentEdit.type === 'appointment'){
+                dispatch(updateAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, user: appointmentEdit.user._id, 
+                newDate: formatUrlDate(toDate(appointmentEdit.date)), newTime: appointmentEdit.time, newUser: userSelected._id})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        toast.success('Appointment updated successfully');
+                    }
+                })
+            } else if(appointmentEdit.type === 'free') {
+                dispatch(bookAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, staff: true, user_id: userSelected._id})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        toast.success('Appointment booked successfully');
+                    }
+                });
+            } else {
+                dispatch(deleteBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(bookAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, staff: true, user_id: userSelected._id})).then(res => {
+                            if (res.meta.requestStatus === 'fulfilled'){
+                                dispatch(reset());
+                                toast.success('Appointment booked successfully');
+                            }
+                        });
+                    }
+                });
+            }
+        }else if(radioValue === 'option2'){
+            if (appointmentEdit.type === 'appointment'){
+                dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        dispatch(addBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(response => {
+                            if (response.meta.requestStatus === 'fulfilled'){
+                                dispatch(reset());
+                                toast.success('Appointment deleted and break added');
+                            }
+                        });
+                    }
+                })
+            } else if(appointmentEdit.type === 'free'){
+                dispatch(addBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(response => {
+                    if (response.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        toast.success("Break added");
+                    }
+                });
+            }else {
+                toast.info("already a break")
+            }
+        }else if (radioValue === 'option3'){
+            if (appointmentEdit.type === 'appointment'){
+                dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        toast.success('Appointment deleted');
+                    }
+                })
+            } else if (appointmentEdit.type === 'free'){
+                toast.info("already free");
+            } else {
+                dispatch(deleteBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                    if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
+                        toast.success("Break deleted");
+                    }
+                });
+            }
+        }
+        closeModal();
     }
 
     const radioChange = (e) => {
@@ -94,14 +167,14 @@ function Appointments() {
 
     const checkClick = (user) => {
         const oldUser = userSelected;
-        if (oldUser.id !== "") {
-            if (oldUser.id !== user.id) {
-                const oldButton = $(`button[name="button-icon-${oldUser.id}"]`)[0];
+        if (oldUser && oldUser._id !== "") {
+            if (oldUser._id !== user._id) {
+                const oldButton = $(`button[name="button-icon-${oldUser._id}"]`)[0];
                 oldButton.classList.remove('active-btn-icon');
             }
         }
         setUserSelected(user);
-        const button = $(`button[name="button-icon-${user.id}"]`)[0];
+        const button = $(`button[name="button-icon-${user._id}"]`)[0];
         button.classList.add('active-btn-icon');
     }
 

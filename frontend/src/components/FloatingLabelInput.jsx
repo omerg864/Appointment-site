@@ -1,6 +1,6 @@
 
 
-function FloatingLabelInput({label, value, setValue, obj, indexed, props, containerStyle, containerProps}) {
+function FloatingLabelInput({label, value, setValue, obj, unique, indexed, props, containerStyle, containerProps}) {
 
     var input_class = '';
     if (value !== "" && value !== undefined){
@@ -20,7 +20,10 @@ function FloatingLabelInput({label, value, setValue, obj, indexed, props, contai
             console.log(indexed);
             setValue(e.target.name, e.target.value, indexed, false, false);
         } else {
-            if (obj){
+            if (unique){
+                setValue(e.target.name, e.target.value, false, false);
+            }
+            else if (obj){
                 setValue({...obj, [e.target.name]: e.target.value});
             } else {
                 setValue(e.target.value);

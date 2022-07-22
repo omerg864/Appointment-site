@@ -123,7 +123,7 @@ const getScheduleDay = async (req, res, next, dateFormatted) => {
     day = await day.populate('appointments.user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
     let free_appointments = createAppointmentsList(day.date, day.startTime, day.endTime, day.interval);
     let schedule = calculateDay(free_appointments, day.breaks, day.appointments, date);
-    return schedule;
+    return {schedule: schedule, start_time: day.startTime, end_time: day.endTime, interval: day.interval, breaks: day.breaks};
 }
 
 const getUserAppointments = asyncHandler(async (req, res, next) => {
@@ -134,20 +134,51 @@ const getUserAppointments = asyncHandler(async (req, res, next) => {
     });
 });
 
-const getDayAppointments = asyncHandler(async (req, res, next) => {
+const updateDay = asyncHandler(async (req, res, next) => {
     const date = formatToDate(req.params.date);
+    const day = await Day.findOne({ date: date });
+    if (!day) {
+        return res.status(404).json({
+            success: false,
+            message: 'Day not found'
+        });
+    }
+    day.startTime = req.body.start_time;
+    day.endTime = req.body.end_time;
+    day.interval = req.body.interval;
+    day.breaks = req.body.breaks;
+    await day.save();
     const dateFormatted = req.params.date.split('-');
-    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    let {schedule, start_time, end_time, interval, breaks} = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
         day: schedule,
-        date
+        date: date,
+        start_time,
+        end_time,
+        interval,
+        breaks
+    });
+});
+
+const getDayAppointments = asyncHandler(async (req, res, next) => {
+    const date = formatToDate(req.params.date);
+    const dateFormatted = req.params.date.split('-');
+    let {schedule, start_time, end_time, interval, breaks} = await getScheduleDay(req, res, next, dateFormatted);
+    res.status(200).json({
+        success: true,
+        day: schedule,
+        date,
+        start_time,
+        end_time,
+        interval,
+        breaks
     });
 });
 
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     const dateFormatted = req.params.date.split('-');
-    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    let { schedule } = await getScheduleDay(req, res, next, dateFormatted);
     const date = formatToDate(req.params.date)
     let free_appointments = [];
     schedule.forEach(appoint => {
@@ -180,11 +211,15 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
         day.appointments.push(appointment._id);
         await day.save();
         const dateFormatted = date.split('-');
-        let schedule = await getScheduleDay(req, res, next, dateFormatted);
+        let { schedule, start_time, end_time, interval, breaks }= await getScheduleDay(req, res, next, dateFormatted);
         res.status(200).json({
             success: true,
             day: schedule,
             date: date_,
+            start_time,
+            end_time,
+            interval,
+            breaks
         });
     }else{
         appointment = await (await Appointment.create({ user: req.user.id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
@@ -230,11 +265,15 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
     day.appointments = day.appointments.filter(appoint => appoint._id.toString() !== appointment._id.toString());
     await day.save();
     const date_formatted = date.split('-');
-    let schedule = await getScheduleDay(req, res, next, date_formatted);
+    let { schedule, start_time, end_time, interval, breaks} = await getScheduleDay(req, res, next, date_formatted);
     res.status(200).json({
         success: true,
         day: schedule,
-        date: date_
+        date: date_,
+        start_time,
+        end_time,
+        interval,
+        breaks
     });
 });
 
@@ -248,11 +287,15 @@ const addBreak = asyncHandler(async (req, res, next) => {
     }
     day.breaks.push(time);
     await day.save();
-    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    let { schedule, start_time, end_time, interval, breaks } = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
         day: schedule,
-        date: date_
+        date: date_,
+        start_time,
+        end_time,
+        interval,
+        breaks
     });
 });
 
@@ -266,11 +309,15 @@ const deleteBreak = asyncHandler(async (req, res, next) => {
     }
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     await day.save();
-    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    let { schedule, start_time, end_time, interval, breaks }= await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
         day: schedule,
-        date: date_
+        date: date_,
+        start_time,
+        end_time,
+        interval,
+        breaks
     });
 });
 
@@ -285,11 +332,15 @@ const updateBreak = asyncHandler(async (req, res, next) => {
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     day.breaks.push(newTime);
     await day.save();
-    let schedule = await getScheduleDay(req, res, next, dateFormatted);
+    let { schedule, start_time, end_time, interval, breaks } = await getScheduleDay(req, res, next, dateFormatted);
     res.status(200).json({
         success: true,
         day: schedule,
-        date: date_
+        date: date_,
+        start_time,
+        end_time,
+        interval,
+        breaks
     });
 });
 
@@ -297,4 +348,4 @@ const updateBreak = asyncHandler(async (req, res, next) => {
 
 
 export { getUserAppointments, getDayAppointments, getFreeDayAppointments, bookAppointment,
-    updateAppointment, deleteAppointment, addBreak, deleteBreak, updateBreak };
+    updateAppointment, deleteAppointment, addBreak, deleteBreak, updateBreak, updateDay };

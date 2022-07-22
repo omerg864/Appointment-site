@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {toast} from 'react-toastify';
+import { toDate, formatUrlDate } from '../../functions/dateFunctions';
 
 const API_URL = '/api/v1/days/';
 
@@ -49,6 +50,11 @@ const deleteBreak = async (token, data) => {
     return response;
 }
 
+const updateDay = async (token, data) => {
+    const response = await axios.put(API_URL + 'updateDay' + `/${formatUrlDate(toDate(data.date))}`, data, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
 const dayService = {
     getDayAppointments,
     getFreeDayAppointments,
@@ -58,7 +64,8 @@ const dayService = {
     deleteAppointment,
     addBreak,
     updateBreak,
-    deleteBreak
+    deleteBreak,
+    updateDay
 }
 
 export default dayService;

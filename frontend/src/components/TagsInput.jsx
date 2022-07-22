@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 
-function TagsInput({ values,  setValues, index1, obj, containerStyles, label, props}) {
+function TagsInput({ values,  setValues, unique, index1, obj, containerStyles, label, props}) {
 
     var idIndex = index1 !== undefined ? index1 : "";
 
@@ -51,13 +51,21 @@ function TagsInput({ values,  setValues, index1, obj, containerStyles, label, pr
                 !value.match(/^\s+$/gi) &&
                 value !== ""
             ) {
-                setValues("breaks", e.target.value, index1, true, false);
+                if (unique) {
+                    setValues("breaks", e.target.value, true, false);
+                } else {
+                    setValues("breaks", e.target.value, index1, true, false);
+                }
                 tags.push(e.target.value.trim());
                 element.value = "";
                 renderTags();
             }
             if (e.keyCode === 8 && value === "") {
-                setValues("breaks", e.target.value, index1, false, true);
+                if (unique) {
+                    setValues("breaks", e.target.value, false, true);
+                } else {
+                    setValues("breaks", e.target.value, index1, false, true);
+                }
                 tags.pop();
                 renderTags();
             }
@@ -88,7 +96,11 @@ function TagsInput({ values,  setValues, index1, obj, containerStyles, label, pr
         span.dataset.index = index;
         span.addEventListener("click", (e) => {
             tags = tags.filter((_, index) => index != e.target.dataset.index);
-            setValues("breaks", tag, index1, false, false);
+            if (unique){
+                setValues("breaks", tag, false, false);
+            } else {
+                setValues("breaks", tag, index1, false, false);
+            }
             renderTags();
         });
         li.appendChild(text);

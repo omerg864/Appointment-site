@@ -10,9 +10,12 @@ import UserDisplay from '../components/UserDisplay';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
-import { getDayAppointments, reset, deleteAppointment, addBreak, updateAppointment, bookAppointment, deleteBreak } from '../features/day/daySlice';
+import { getDayAppointments, reset, deleteAppointment, addBreak, updateAppointment, bookAppointment, deleteBreak, updateDay } from '../features/day/daySlice';
 import { getUsers, reset as userReset } from '../features/auth/authSlice';
 import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
+import { MdModeEdit } from 'react-icons/md';
+import ScheduleDay from '../components/ScheduleDay';
+
 
 function Appointments() {
 
@@ -22,6 +25,8 @@ function Appointments() {
     const { day, isLoading, isError, message, isSuccess } = useSelector(state => state.day);
 
     const auth = useSelector(state => state.auth);
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const [date, setDate] = useState(new Date());
 
@@ -38,6 +43,17 @@ function Appointments() {
         time: '',
         date: '2020-01-01T00:00:00.000Z',
     })
+
+    const [editOpen, setEditOpen] = useState(false);
+
+    const [daySelected, setDaySelected] = useState({
+        date: '',
+        start_time: '',
+        end_time: '',
+        breaks: [],
+        _id: '',
+        interval: ""
+    });
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -79,6 +95,17 @@ function Appointments() {
         setUserSelected(appointment.user);
     }
 
+    const openDayModal = () => {
+        setDaySelected({
+            date: day.date,
+            start_time: day.start_time,
+            end_time: day.end_time,
+            breaks: day.breaks,
+            interval: day.interval
+        });
+        setEditOpen(true);
+    }
+
     const editAppointment = () => {
         console.log(radioValue);
         if(radioValue === 'option1'){
@@ -100,6 +127,7 @@ function Appointments() {
             } else {
                 dispatch(deleteBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
                     if (res.meta.requestStatus === 'fulfilled'){
+                        dispatch(reset());
                         dispatch(bookAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, staff: true, user_id: userSelected._id})).then(res => {
                             if (res.meta.requestStatus === 'fulfilled'){
                                 dispatch(reset());
@@ -154,6 +182,15 @@ function Appointments() {
         closeModal();
     }
 
+    const saveDay = () => {
+        dispatch(updateDay(daySelected)).then((res) => {
+            if (res.meta.requestStatus === 'fulfilled'){
+                dispatch(reset());
+            }
+        });
+        closeDayModal();
+    };
+
     const radioChange = (e) => {
         var filterDay = $('#radio-group input:radio:checked').val()
         setRadioValue(filterDay);
@@ -176,14 +213,25 @@ function Appointments() {
         setIsOpen(false);
         setRadioValue('');
         setUserSelected({
-            f_name: '',
-            l_name: '',
-            phone: '',
-            email: '',
-            staff: false,
+            date: '',
+            start_time: '',
+            end_time: '',
+            breaks: [],
             _id: '',
+            interval: ""
         });
         setSearch('');
+    };
+
+    const closeDayModal = () => {
+        setEditOpen(false);
+        setDaySelected({
+            date: '',
+            breaks: [],
+            _id: '',
+            interval: ""
+
+        });
     };
 
     const modalChildren = (
@@ -232,7 +280,29 @@ function Appointments() {
             </div>
     );
 
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayChange = (name, value, add, pop) => {
+        let tempDay = {...daySelected}
+        if (name === 'breaks') {
+            let breaks = [...daySelected["breaks"]];
+            if (add) {
+                breaks.push(value);
+            } else {
+                if (pop) {
+                    breaks.pop();
+                } else {
+                    breaks = breaks.filter(b => b !== value);
+                }
+            }
+            tempDay[name] = breaks;
+        } else {
+            tempDay[name] = value;
+        }
+        setDaySelected(tempDay);
+    };
+
+    const editModalChildren = (
+        <ScheduleDay title={`${formatDate(toDate(daySelected.date))} ${days[toDate(daySelected.date).getDay()]}`} unique={true} data={daySelected} setData={dayChange} containerStyles={{marginBottom: '20px'}}/>
+    )
 
     if (isLoading || auth.isLoading) {
         return <Spinner />;
@@ -242,11 +312,16 @@ function Appointments() {
         <>
         <Modal isOpen={isOpen} onClose={closeModal} onSubmit={editAppointment} title="Edit Appointment" message={`${formatDate(toDate(appointmentEdit.date))} ${days[toDate(appointmentEdit.date).getDay()]} at ${appointmentEdit.time} `}
         children={modalChildren} submitText="Save Changes" cancelText={"Cancel"}/>
+        <Modal isOpen={editOpen} onClose={closeDayModal} onSubmit={saveDay} title="Edit Day"
+        children={editModalChildren} submitText="Save Changes" cancelText={"Cancel"}/>
             <div className="management-container">
             <h1 style={{marginBottom: '20px'}}>Appointments</h1>
                 <Calendar calendarType="Hebrew" onChange={setDate} defaultValue={date}/>
+                <div  className='relative-container'>
                 <h4 style={{marginTop: '20px'}}>{formatDate(date)}</h4>
-                <div className='appointments-container'>
+                <button className={`btn-icon2 top-left2`} onClick={openDayModal} style={{height: '45px', width: '50px'}} name={`button-icon`}><MdModeEdit color='grey' size={'24px'}/></button>
+                </div>
+                <div className='appointments-container relative-container'>
                     {day.appointments.map((appointment, index) => {
                         return <AppointmentButtonStaff key={index} appointment={appointment} onClick={openModal}/>;
                     })}

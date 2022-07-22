@@ -115,6 +115,18 @@ export const deleteBreak = createAsyncThunk("day/deleteBreak", async (data, thun
 });
 
 
+export const updateDay = createAsyncThunk("day/updateDay", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.updateDay(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+
 export const daySlice = createSlice({
     name: "day",
     initialState,
@@ -132,7 +144,8 @@ export const daySlice = createSlice({
         });
         builder.addCase(getDayAppointments.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.day = {appointments: action.payload.day,  date: action.payload.date};
+            state.day = {appointments: action.payload.day,  date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                breaks: action.payload.breaks, interval: action.payload.interval};
         });
         builder.addCase(getDayAppointments.rejected, (state, action) => {
             state.isLoading = false;
@@ -159,7 +172,8 @@ export const daySlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             if (action.meta.arg.staff) {
-                state.day = {appointments: action.payload.day, date: action.payload.date};
+                state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                    interval: action.payload.interval, breaks: action.payload.breaks};
             }
         });
         builder.addCase(bookAppointment.rejected, (state, action) => {
@@ -206,7 +220,8 @@ export const daySlice = createSlice({
         builder.addCase(deleteAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.day, date: action.payload.date};
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
         });
         builder.addCase(deleteAppointment.rejected, (state, action) => {
             state.isLoading = false;
@@ -219,7 +234,8 @@ export const daySlice = createSlice({
         builder.addCase(addBreak.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.day, date: action.payload.date};
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
         });
         builder.addCase(addBreak.rejected, (state, action) => {
             state.isLoading = false;
@@ -232,7 +248,8 @@ export const daySlice = createSlice({
         builder.addCase(updateBreak.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.day, date: action.payload.date};
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
         });
         builder.addCase(updateBreak.rejected, (state, action) => {
             state.isLoading = false;
@@ -245,9 +262,24 @@ export const daySlice = createSlice({
         builder.addCase(deleteBreak.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.day, date: action.payload.date};
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
         });
         builder.addCase(deleteBreak.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(updateDay.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(updateDay.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
+        });
+        builder.addCase(updateDay.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.message = action.payload.message;

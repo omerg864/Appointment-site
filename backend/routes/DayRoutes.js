@@ -1,7 +1,7 @@
 import express from 'express';
 import { protectUser, protectStaff } from '../middleware/AuthMiddleware.js';
 import { getDayAppointments, getFreeDayAppointments, bookAppointment, getUserAppointments,
-    updateAppointment, deleteAppointment, addBreak, updateBreak, deleteBreak } from '../controllers/DayController.js';
+    updateAppointment, deleteAppointment, addBreak, updateBreak, deleteBreak, updateDay } from '../controllers/DayController.js';
 
 const router = express.Router();
 
@@ -16,6 +16,7 @@ router.delete('/deleteAppointment/:date/:time', protectUser, deleteAppointment);
 router.post('/addBreak', protectStaff, addBreak);
 router.put('/updateBreak', protectStaff, updateBreak);
 router.delete('/deleteBreak/:date/:time', protectStaff, deleteBreak);
+router.put('/updateDay/:date', protectStaff, updateDay);
 
 
 export default router;

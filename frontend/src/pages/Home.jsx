@@ -2,7 +2,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getSiteSettings, reset } from '../features/settings/settingsSlice';
 import Spinner from '../components/Spinner';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { authenticate, authenticateStaff } from '../features/auth/authSlice';
 
 
 
@@ -21,6 +22,20 @@ function Home() {
     });
   }, []);
 
+  const [authenticated, setAuthenticated] = useState(false);
+
+  const auth = useSelector(state => state.auth);
+
+  useEffect(() => {
+    authenticate(auth.user).then(response => {
+      if (response.authenticated) {
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+      }
+    });
+  }, []);
+
 
   const gotoAppointment = () => {
     navigate('/appointment');
@@ -35,7 +50,7 @@ function Home() {
     <>
       <h1 className="title">{process.env.REACT_APP_SITE_TITLE}</h1>
       <div className="description">
-        {!user ? 
+        {!authenticated ? 
         <p>
           Welcome please sign in or register to book your appointment.
         </p>
@@ -46,7 +61,7 @@ function Home() {
           <button className="btn btn-light" style={{width: '60%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
           </div>)}
       </div>
-      {user && settings.site_description.length > 0 && 
+      {authenticated && settings.site_description.length > 0 && 
       <div className="message">
         <p className='site_description'>
           {settings.site_description}

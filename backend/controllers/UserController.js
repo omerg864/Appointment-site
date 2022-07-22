@@ -215,5 +215,19 @@ const getUsers = asyncHandler(async (req, res, next) => {
     });
 });
 
+const authenticate = asyncHandler(async (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        authenticated: true
+    });
+});
 
-export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers };
+const authenticateStaff = asyncHandler(async (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        authenticated: true
+    });
+});
+
+
+export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticate, authenticateStaff };

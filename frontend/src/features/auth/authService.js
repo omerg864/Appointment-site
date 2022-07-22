@@ -43,6 +43,16 @@ const getUsers = async (token) => {
     return response;
 }
 
+const authenticate = async (token) => {
+    const response = await axios.get(API_URL + 'authenticate', {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
+const authenticateStaff = async (token) => {
+    const response = await axios.get(API_URL + 'authenticateStaff', {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
 const authService = {
     register,
     login,
@@ -51,7 +61,9 @@ const authService = {
     updateUser,
     deleteUser,
     updateUserPassword,
-    getUsers
+    getUsers,
+    authenticate,
+    authenticateStaff
 }
 
 export default authService;

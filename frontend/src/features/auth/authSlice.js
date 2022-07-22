@@ -101,6 +101,26 @@ export const getUsers = createAsyncThunk("auth/getUsers", async (_, thunkAPI) =>
     }
 });
 
+export const authenticate = async (user) => {
+    if (!user || !user.token){
+        return false;
+    }
+    else {
+        const response = await authService.authenticate(user.token);
+        return response.data;
+    }
+};
+
+export const authenticateStaff = async (user) => {
+    if (!user || !user.token){
+        return false;
+    }
+    else {
+        const response = await authService.authenticateStaff(user.token);
+        return response.data;
+    }
+};
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,

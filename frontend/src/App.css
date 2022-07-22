@@ -511,27 +511,6 @@
   justify-content: flex-start;
 }
 
-
-
-@media (max-width: 700px) {
-  .user-info {
-    border-bottom: #ffff dashed 1px;
-    margin-bottom: 20px;
-  }
-  #email-container {
-    flex: none;
-  }
-  .save-container {
-    display: block;
-  }
-}
-
-@media (min-width: 701px) {
-  #email-container {
-    flex: 1;
-  }
-}
-
 .checkbox-container {
   position: relative;
   width: fit-content;
@@ -630,4 +609,35 @@
 .site_description {
   word-wrap: break-word;
   white-space: pre-line;
+}
+
+.users-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 1rem;
+}
+
+.top-left {
+  position: absolute;
+  top: 10px;
+  left: 4px;
+}
+
+.delete-button {
+  border-radius: 50%;
+  margin-left: 8px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  background-color: transparent;
+  border: none;
+}
+
+.delete-icon {
+  color: rgb(155, 42, 42);
+}
+
+.delete-button:hover > .delete-icon {
+  color: rgb(255, 0, 0);
 }

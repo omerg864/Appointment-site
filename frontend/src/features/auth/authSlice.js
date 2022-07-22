@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { current } from "@reduxjs/toolkit";
 import authService from "./authService";
 
 
@@ -119,8 +120,6 @@ export const authSlice = createSlice({
         builder.addCase(register.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.user = action.payload.user;
-            localStorage.setItem("user", JSON.stringify(action.payload.user));
         });
         builder.addCase(register.rejected, (state, action) => {
             state.isLoading = false;
@@ -174,7 +173,10 @@ export const authSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             if (action.payload.staff) {
-                state.users = state.users.filter(user => user.id !== action.payload.user.id).push(action.payload.user);
+                var users = [];
+                users = current(state).users.filter((user) => user._id !== action.payload.user._id);
+                users.unshift(action.payload.user);
+                state.users = users;
             } else {
                 state.user = action.payload.user;
                 localStorage.setItem("user", JSON.stringify(action.payload.user));
@@ -191,7 +193,7 @@ export const authSlice = createSlice({
         builder.addCase(deleteUser.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.users = state.users.filter(user => user.id !== action.payload.user.id);
+            state.users = state.users.filter(user => user._id !== action.payload.user._id);
         });
         builder.addCase(deleteUser.rejected, (state, action) => {
             state.isLoading = false;

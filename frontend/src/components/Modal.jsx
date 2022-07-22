@@ -1,9 +1,10 @@
 
 
 
-import React from 'react'
+import React from 'react';
+import { MdDelete } from 'react-icons/md';
 
-function Modal({ isOpen, onClose, onSubmit, title, message, children, submitText, cancelText }) {
+function Modal({ isOpen, onClose, onSubmit, title, message, children, submitText, cancelText, deleteButton, onDelete }) {
 
     if (!isOpen) {
         return null
@@ -14,7 +15,11 @@ function Modal({ isOpen, onClose, onSubmit, title, message, children, submitText
     <div className='login-container relative-container'>
         <h1>{title}</h1>
         <button type="button" className="btn-close btn-close-white" id="close-button" onClick={onClose} aria-label="Close" ></button>
-        <p>{message}</p>
+        {deleteButton && 
+        <button className={`delete-button top-left`} onClick={onDelete} name={`button-icon`}><MdDelete className="delete-icon" size={'24px'}/></button>}
+        <p>
+            {message}
+        </p>
         <div>
             {children}
         </div>

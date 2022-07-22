@@ -217,8 +217,10 @@ function Appointments() {
                     if (user.f_name.toLowerCase().includes(search.toLowerCase()) || user.l_name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase()) || user.phone.toLowerCase().includes(search.toLowerCase())) {
                         return user;
                     }
-                }).map((user) => {
-                    return <UserDisplay user={user} onClick={checkClick} selectedUser={userSelected}/>
+                }).map((user, index) => {
+                    if (index < 10) {
+                        return <UserDisplay user={user} onClick={checkClick} selectedUser={userSelected}/>
+                    }
                 })}
             </div>
             </div>)}

@@ -1,9 +1,9 @@
-import { MdCheck } from 'react-icons/md';
+import { MdModeEdit, MdCheck } from 'react-icons/md';
 
 
 
 
-function UserDisplay({ user, onClick, selectedUser }) {
+function UserDisplay({ user, onClick, selectedUser, edit, editSubmit }) {
 
     var className = "";
 
@@ -17,9 +17,12 @@ function UserDisplay({ user, onClick, selectedUser }) {
         <p style={{margin: 0}}>{user.phone}</p>
         <p style={{margin: 0}}>{user.email}</p>
         </div>
-        <button className={`btn-icon2 ${className}`} onClick={() => onClick(user)} style={{height: '45px', width: '50px'}} name={`button-icon-${user._id}`}><MdCheck color='green' size={'24px'}/></button>
+        {edit ?
+        <button className={`btn-icon2`} onClick={() => editSubmit(user)} style={{height: '45px', width: '50px'}} name={`button-icon-${user._id}`}><MdModeEdit color='grey' size={'24px'}/></button>
+        :
+        <button className={`btn-icon2 ${className}`} onClick={() => onClick(user)} style={{height: '45px', width: '50px'}} name={`button-icon-${user._id}`}><MdCheck color='green' size={'24px'}/></button>}
     </div>
   )
 }
 
-export default UserDisplay
+export default UserDisplay;

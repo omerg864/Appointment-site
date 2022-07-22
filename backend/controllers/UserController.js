@@ -3,6 +3,7 @@ import User from '../models/UserModel.js';
 import Settings from '../models/SettingsModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import Appointment from '../models/AppointmentModel.js';
 
 const deselect = ['-password', "-OTP", "-__v", "-createdAt", "-updatedAt"];
 
@@ -112,24 +113,22 @@ const updateUser = asyncHandler(async (req, res, next) => {
             staff: false
         });
     } else {
-        const { user_id } = req.body;
-        if (user_id){
-            const userToUpdate = await User.findById(user_id).select(deselect);
+        const { _id, staff } = req.body;
+        if (_id){
+            const userToUpdate = await User.findById(_id).select(deselect);
             if (!userToUpdate) {
                 res.status(400)
                 throw new Error("User does not exist");
             }
-            const { staff } = req.body;
             userToUpdate.f_name = f_name;
             userToUpdate.l_name = l_name;
             userToUpdate.email = email;
             userToUpdate.phone = phone;
             userToUpdate.staff = staff;
             await userToUpdate.save();
-            const token = jwt.sign({ id: userToUpdate._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
             res.status(200).json({
                 success: true,
-                user: {...userToUpdate._doc, token},
+                user: userToUpdate,
                 staff: true
             });
         } else {
@@ -153,8 +152,20 @@ const deleteUser = asyncHandler(async (req, res, next) => {
         res.status(401)
         throw new Error("Not Authorized");
     }
-    const { user_id } = req.params.id;
-    const userToDelete = await User.findByIdAndDelete(user_id).select(deselect);
+    const { id } = req.params;
+    const userToDelete = await User.findById(id);
+    if (!userToDelete) {
+        res.status(400)
+        throw new Error("User does not exist");
+    }
+    const appointments = await Appointment.find({ user: userToDelete});
+    console.log(appointments);
+    if (appointments.length > 0){
+        for (const appointment of appointments){
+            await appointment.remove();
+        }
+    }
+    await userToDelete.remove();
     res.status(200).json({
         success: true,
         message: "User deleted",

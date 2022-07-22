@@ -15,6 +15,8 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
     
     let tags = values || [];
 
+    console.log(values);
+
     if (values) {
         renderTags();
     }

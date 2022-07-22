@@ -61,12 +61,6 @@ function Appointments() {
     }, [date]);
 
     useEffect(() => {
-        dispatch(getDayAppointments(formatUrlDate(date))).then(() => {
-            dispatch(reset());
-        });
-    }, [isSuccess]);
-
-    useEffect(() => {
         if (isError){
             toast.error(message);
         }

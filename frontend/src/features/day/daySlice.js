@@ -158,6 +158,9 @@ export const daySlice = createSlice({
         builder.addCase(bookAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
+            if (action.meta.arg.staff) {
+                state.day = {appointments: action.payload.day, date: action.payload.date};
+            }
         });
         builder.addCase(bookAppointment.rejected, (state, action) => {
             state.isLoading = false;
@@ -203,6 +206,7 @@ export const daySlice = createSlice({
         builder.addCase(deleteAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date};
         });
         builder.addCase(deleteAppointment.rejected, (state, action) => {
             state.isLoading = false;

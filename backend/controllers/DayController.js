@@ -139,19 +139,28 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
     var appointment = ""
     if (staff && req.user.staff) {
         appointment = await (await Appointment.create({ user: user_id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+        day.appointments.push(appointment._id);
+        await day.save();
+        const dateFormatted = date.split('-');
+        let schedule = await getScheduleDay(req, res, next, dateFormatted);
+        res.status(200).json({
+            success: true,
+            day: schedule,
+            date: date_,
+        });
     }else{
         appointment = await (await Appointment.create({ user: req.user.id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
-    }
-    day.appointments.push(appointment._id);
-    await day.save();
-    res.status(200).json({
+        day.appointments.push(appointment._id);
+        await day.save();
+        res.status(200).json({
         success: true,
         appointment
     });
+    }
 });
 
 const updateAppointment = asyncHandler(async (req, res, next) => {
-    const { date, time, user_id, newDate, newTime, newUser } = req.body;
+    const { date, time, newDate, newTime, newUser } = req.body;
     const date_ = formatToDate(date);
     const newDate_ = formatToDate(newDate);
     const findNewUser = await User.findOne({ _id: newUser });
@@ -182,9 +191,11 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
     const appointment = await Appointment.findOneAndDelete({ time: time, date: date_ });
     day.appointments = day.appointments.filter(appoint => appoint._id.toString() !== appointment._id.toString());
     await day.save();
+    const date_formatted = date.split('-');
+    let schedule = await getScheduleDay(req, res, next, date_formatted);
     res.status(200).json({
         success: true,
-        appointment,
+        day: schedule,
         date: date_
     });
 });

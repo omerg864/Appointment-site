@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+
 function FloatingLabelInput({label, value, setValue, obj, indexed, props, containerStyle, containerProps}) {
 
     var input_class = '';
@@ -17,7 +18,7 @@ function FloatingLabelInput({label, value, setValue, obj, indexed, props, contai
     const OnChange = (e) => {
         if (indexed !== undefined) {
             console.log(indexed);
-            setValue(e.target.name, e.target.value, indexed);
+            setValue(e.target.name, e.target.value, indexed, false, false);
         } else {
             if (obj){
                 setValue({...obj, [e.target.name]: e.target.value});

@@ -641,3 +641,8 @@
 .delete-button:hover > .delete-icon {
   color: rgb(255, 0, 0);
 }
+
+.text-area {
+  resize: vertical;
+  height: auto;
+}

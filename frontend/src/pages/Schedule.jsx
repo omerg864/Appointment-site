@@ -40,9 +40,23 @@ function Schedule() {
         });
     }
 
-    const scheduleChange = (name, value, index) => {
+    const scheduleChange = (name, value, index, add, pop) => {
         let tempSchedule = {...schedule[index]};
-        tempSchedule[name] = value;
+        if (name === 'breaks') {
+            let breaks = [...tempSchedule["breaks"]];
+            if (add) {
+                breaks.push(value);
+            } else {
+                if (pop) {
+                    breaks.pop();
+                } else {
+                    breaks = breaks.filter(b => b !== value);
+                }
+            }
+            tempSchedule[name] = breaks;
+        } else {
+            tempSchedule[name] = value;
+        }
         let newSchedule = [...schedule];
         newSchedule[index] = tempSchedule;
         setSchedule(newSchedule);
@@ -58,7 +72,7 @@ function Schedule() {
         <div className="management-container">
             <h1 style={{marginBottom: '20px'}}>Schedule</h1>
             {schedule.map((schedule1, index) => {
-                return <ScheduleDay title={days[index]} index={index} data={schedule1} setData={scheduleChange} containerStyles={{marginBottom: '20px'}}/>
+                return <ScheduleDay key={index} title={days[index]} index={index} data={schedule1} setData={scheduleChange} containerStyles={{marginBottom: '20px'}}/>
             })}
             <div className='save-container'>
                 <button className='btn btn-light' id="btn-sub" onClick={saveScheduleChange}>Save Changes</button>

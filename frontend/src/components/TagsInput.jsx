@@ -1,9 +1,9 @@
 import $ from 'jquery';
 
 
-function TagsInput({ values,  setValues, index, containerStyles, label, props}) {
+function TagsInput({ values,  setValues, index1, obj, containerStyles, label, props}) {
 
-    var idIndex = index !== undefined ? index : "";
+    var idIndex = index1 !== undefined ? index1 : "";
 
     var active = values ? "label-active" : "";
 
@@ -13,15 +13,14 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
     const ul = document.querySelector(`#tag-ul-${idIndex}`);
     const label = document.querySelector(`#tag-label-${idIndex}`);
     
-    let tags = values || [];
+    let tags = [...values] || [];
 
-    console.log(values);
-
-    if (values) {
+    if (tags && tags.length > 0) {
         renderTags();
     }
     
     function addEvent(element) {
+        if (element) {
         tagArea.addEventListener("click", () => {
             element.focus();
         });
@@ -37,7 +36,6 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
                 label.classList.remove("label-active");
             }
             if (!element.value.match(/^\s+$/gi) && element.value !== "") {
-                setValues([...tags, e.target.value.trim()]);
                 tags.push(e.target.value.trim());
                 element.value = "";
                 renderTags();
@@ -53,16 +51,19 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
                 !value.match(/^\s+$/gi) &&
                 value !== ""
             ) {
+                setValues("breaks", e.target.value, index1, true, false);
                 tags.push(e.target.value.trim());
                 element.value = "";
                 renderTags();
             }
             if (e.keyCode === 8 && value === "") {
+                setValues("breaks", e.target.value, index1, false, true);
                 tags.pop();
                 renderTags();
             }
         });
     }
+}
     addEvent(tagInput);
     
     function renderTags() {
@@ -75,7 +76,6 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
         input.className = "tag-input";
         addEvent(input);
         ul.appendChild(input);
-        input.focus();
         setTimeout(() => (input.value = ""), 0);
     }
     
@@ -88,6 +88,7 @@ function TagsInput({ values,  setValues, index, containerStyles, label, props}) 
         span.dataset.index = index;
         span.addEventListener("click", (e) => {
             tags = tags.filter((_, index) => index != e.target.dataset.index);
+            setValues("breaks", tag, index1, false, false);
             renderTags();
         });
         li.appendChild(text);

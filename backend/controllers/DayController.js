@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Day from '../models/DayModel.js';
 import Appointment from '../models/AppointmentModel.js';
 import User from '../models/UserModel.js';
+import Settings from '../models/SettingsModel.js';
 
 
 
@@ -76,11 +77,48 @@ const calculateDay = (free_appointments, breaks, appointments, date) => {
     return schedule;
 }
 
+const createSettings = async () => {
+    let scheduleDefaultDay = {
+        start_time: "08:00",
+        end_time: "20:00",
+        breaks: ["10:00", "14:00"],
+        interval: "30m"
+    };
+    let scheduleDefault = [];
+    for (let i = 0; i < 7; i++) {
+        scheduleDefault.push(scheduleDefaultDay);
+    }
+    var settings = await Settings.create({
+        site_description: "",
+        register_code: "123456",
+        schedule: scheduleDefault
+    });
+    return settings;
+}
+
+const createDay = async (date) => {
+    var day = date.getDay();
+    if (day === 0) {
+        day = 6;
+    } else {
+        day = day - 1;
+    }
+    var settings = await Settings.findOne();
+    if (!settings) {
+        await createSettings();
+        settings = await Settings.findOne();
+    }
+    const day_schedule = settings.schedule[day];
+    return await Day.create({ date: date, startTime: day_schedule.start_time, endTime: day_schedule.end_time, interval: day_schedule.interval, breaks: day_schedule.breaks, appointments: [] });
+}
+
+
+
 const getScheduleDay = async (req, res, next, dateFormatted) => {
     const date = new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]) + 1);
     var day = await Day.findOne({ date: date }).populate('appointments', ['date', 'user', 'time', '_id']);
     if (!day){
-        day = await Day.create({ date: date, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
+        day = await createDay(date);
     }
     day = await day.populate('appointments.user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
     let free_appointments = createAppointmentsList(day.date, day.startTime, day.endTime, day.interval);
@@ -134,7 +172,7 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
     const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
-        day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
+        day = await createDay(date_);
     }
     var appointment = ""
     if (staff && req.user.staff) {
@@ -206,7 +244,7 @@ const addBreak = asyncHandler(async (req, res, next) => {
     const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
-        day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
+        day = await createDay(date_);
     }
     day.breaks.push(time);
     await day.save();
@@ -224,7 +262,7 @@ const deleteBreak = asyncHandler(async (req, res, next) => {
     const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
-        day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
+        day = await createDay(date_);
     }
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     await day.save();
@@ -242,7 +280,7 @@ const updateBreak = asyncHandler(async (req, res, next) => {
     const date_ = formatToDate(date);
     var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
     if (!day){
-        day = await Day.create({ date: date_, startTime: "08:00", endTime: "20:00", interval: "30m", breaks: ["10:00", "14:00"], appointments: [] });
+        day = await createDay(date_);
     }
     day.breaks = day.breaks.filter(break_ => break_ !== time);
     day.breaks.push(newTime);

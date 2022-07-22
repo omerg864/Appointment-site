@@ -1,4 +1,4 @@
-
+import $ from 'jquery';
 
 
 
@@ -8,6 +8,13 @@ function FloatingLabelTextArea({ label, value, setValue, obj, props, containerSt
     if (value !== "" && value !== undefined){
         input_class = "label2 filled2";
     }
+    $(function() {
+        const textarea = document.getElementById(label);
+        textarea.addEventListener("input", function (e) {
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+        });
+    })
     document.querySelectorAll(".text-input2").forEach((element) => {
         element.addEventListener("blur",(event) => {
             if(event.target.value !== ""){
@@ -31,7 +38,7 @@ function FloatingLabelTextArea({ label, value, setValue, obj, props, containerSt
     id={label}
     value={value}
     onChange={(e) => OnChange(e)}
-    className="text-input2"
+    className="text-input2 text-area"
     autoComplete="off"
     placeholder={`Enter your ${label}`}
     {...props}

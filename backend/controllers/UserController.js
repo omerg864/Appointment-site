@@ -7,7 +7,7 @@ import Appointment from '../models/AppointmentModel.js';
 import crypto from 'crypto';
 import { sendEmail } from '../helpers/email.js';
 
-const deselect = ['-password', "-reset_code", "-__v", "-createdAt", "-updatedAt"];
+const deselect = ['-password', "-reset_token", "-__v", "-createdAt", "-updatedAt"];
 
 
 const createSettings = async () => {

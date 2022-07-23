@@ -56,10 +56,10 @@ function Appointment() {
     const toBookAppointment = () => {
         dispatch(bookAppointment({date: formatUrlDate(date), time: timeSelected})).then((response) => {
             if (response.meta.requestStatus === 'fulfilled') {
-                dispatch(reset());
                 toast.success('Appointment booked successfully');
                 navigate('/');
             }
+            dispatch(reset());
         });
     }
 

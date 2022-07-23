@@ -261,6 +261,33 @@ const deleteAppointment = asyncHandler(async (req, res, next) => {
         res.status(400);
         throw new Error('Appointment not found');
     }
+    const appointment = await Appointment.findOne({ time: time, date: date_ }).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    if (!appointment){
+        res.status(400);
+        throw new Error('Appointment not found');
+    }
+    if (req.user._id.toString() !== appointment.user._id.toString()){
+        res.status(400);
+        throw new Error('You are not authorized to delete this appointment');
+    }
+    await Appointment.findOneAndDelete({ time: time, date: date_ });
+    day.appointments = day.appointments.filter(appoint => appoint._id.toString() !== appointment._id.toString());
+    await day.save();
+    const appointments = await Appointment.find({ user: req.user }).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    res.status(200).json({
+        success: true,
+        appointments
+    });
+});
+
+const deleteAppointmentStaff = asyncHandler(async (req, res, next) => {
+    const { date, time } = req.params;
+    const date_ = formatToDate(date);
+    var day = await Day.findOne({ date: date_ }).populate('appointments', ['user', 'time', '_id']);
+    if (!day){
+        res.status(400);
+        throw new Error('Appointment not found');
+    }
     const appointment = await Appointment.findOneAndDelete({ time: time, date: date_ });
     day.appointments = day.appointments.filter(appoint => appoint._id.toString() !== appointment._id.toString());
     await day.save();
@@ -348,4 +375,4 @@ const updateBreak = asyncHandler(async (req, res, next) => {
 
 
 export { getUserAppointments, getDayAppointments, getFreeDayAppointments, bookAppointment,
-    updateAppointment, deleteAppointment, addBreak, deleteBreak, updateBreak, updateDay };
+    updateAppointment, deleteAppointment, addBreak, deleteBreak, updateBreak, updateDay, deleteAppointmentStaff };

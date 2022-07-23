@@ -56,8 +56,8 @@ function Login() {
             </div>
             </form>
             <div style={{marginTop: '10px'}} className="space-div">
-                <a>Forgot your password? <a href="/forgot" style={{color: "white"}}>Reset Password</a></a>
-            <a>Don't have an account? <a href="/register" style={{color: "white"}}>Register</a></a>
+                <span>Forgot your password? <a href="/forgot" style={{color: "white"}}>Reset Password</a></span>
+            <span>Don't have an account? <a href="/register" style={{color: "white"}}>Register</a></span>
             </div>
         </div>
     );

@@ -10,10 +10,12 @@ function FloatingLabelTextArea({ label, value, setValue, obj, props, containerSt
     }
     $(function() {
         const textarea = document.getElementById(label);
-        textarea.addEventListener("input", function (e) {
-            this.style.height = "auto";
-            this.style.height = this.scrollHeight + "px";
-        });
+        if (textarea) {
+            textarea.addEventListener("input", function (e) {
+                this.style.height = "auto";
+                this.style.height = this.scrollHeight + "px";
+            });
+        }
     })
     document.querySelectorAll(".text-input2").forEach((element) => {
         element.addEventListener("blur",(event) => {

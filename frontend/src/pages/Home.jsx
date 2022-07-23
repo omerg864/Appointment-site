@@ -56,7 +56,7 @@ function Home() {
         </p>
         : (<div>
         <p>
-          Welcome {user.f_name}
+          Welcome {user && user.f_name}
           </p>
           <button className="btn btn-light" style={{width: '60%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
           </div>)}

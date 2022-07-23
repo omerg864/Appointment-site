@@ -104,7 +104,10 @@ function Profile() {
   }
 
   const cancelAppointment = () => {
-    dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentSelected.date)), time: appointmentSelected.time})).then(() => {
+    dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentSelected.date)), time: appointmentSelected.time})).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        toast.success("Appointment cancelled successfully");
+      }
       dispatch(reset());
       setIsOpen(false);
     });

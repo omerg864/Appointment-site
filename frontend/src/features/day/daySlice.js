@@ -81,6 +81,17 @@ export const deleteAppointment = createAsyncThunk("day/deleteAppointment", async
     }
 });
 
+export const deleteAppointmentStaff = createAsyncThunk("day/deleteAppointmentStaff", async (data, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await dayService.deleteAppointmentStaff(token, data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
 export const addBreak = createAsyncThunk("day/addBreak", async (data, thunkAPI) => {
     try{
         const token = thunkAPI.getState().auth.user.token;
@@ -214,14 +225,27 @@ export const daySlice = createSlice({
             state.isError = true;
             state.message = action.payload.message;
         });
+        builder.addCase(deleteAppointmentStaff.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(deleteAppointmentStaff.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
+                interval: action.payload.interval, breaks: action.payload.breaks};
+        });
+        builder.addCase(deleteAppointmentStaff.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
         builder.addCase(deleteAppointment.pending, (state, action) => {
             state.isLoading = true;
         });
         builder.addCase(deleteAppointment.fulfilled, (state, action) => {
             state.isLoading = false;
             state.isSuccess = true;
-            state.day = {appointments: action.payload.day, date: action.payload.date, start_time: action.payload.start_time, end_time: action.payload.end_time,
-                interval: action.payload.interval, breaks: action.payload.breaks};
+            state.appointments = action.payload.appointments;
         });
         builder.addCase(deleteAppointment.rejected, (state, action) => {
             state.isLoading = false;

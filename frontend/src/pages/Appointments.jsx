@@ -10,7 +10,7 @@ import UserDisplay from '../components/UserDisplay';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
-import { getDayAppointments, reset, deleteAppointment, addBreak, updateAppointment, bookAppointment, deleteBreak, updateDay } from '../features/day/daySlice';
+import { getDayAppointments, reset, deleteAppointmentStaff, addBreak, updateAppointment, bookAppointment, deleteBreak, updateDay } from '../features/day/daySlice';
 import { getUsers, reset as userReset } from '../features/auth/authSlice';
 import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
 import { MdModeEdit } from 'react-icons/md';
@@ -143,7 +143,7 @@ function Appointments() {
             }
         }else if(radioValue === 'option2'){
             if (appointmentEdit.type === 'appointment'){
-                dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                dispatch(deleteAppointmentStaff({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, staff: true})).then(res => {
                     if (res.meta.requestStatus === 'fulfilled'){
                         dispatch(reset());
                         dispatch(addBreak({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(response => {
@@ -166,7 +166,7 @@ function Appointments() {
             }
         }else if (radioValue === 'option3'){
             if (appointmentEdit.type === 'appointment'){
-                dispatch(deleteAppointment({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time})).then(res => {
+                dispatch(deleteAppointmentStaff({date: formatUrlDate(toDate(appointmentEdit.date)), time: appointmentEdit.time, staff: true})).then(res => {
                     if (res.meta.requestStatus === 'fulfilled'){
                         dispatch(reset());
                         toast.success('Appointment deleted');

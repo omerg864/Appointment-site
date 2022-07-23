@@ -35,6 +35,11 @@ const deleteAppointment = async (token, data) => {
     return response;
 }
 
+const deleteAppointmentStaff = async (token, data) => {
+    const response = await axios.delete(API_URL + 'deleteAppointmentStaff' + `/${data.date}/${data.time}`, {headers: {Authorization: `Bearer ${token}`}});
+    return response;
+}
+
 const addBreak = async (token, data) => {
     const response = await axios.post(API_URL + 'addBreak', data, {headers: {Authorization: `Bearer ${token}`}});
     return response;
@@ -65,7 +70,8 @@ const dayService = {
     addBreak,
     updateBreak,
     deleteBreak,
-    updateDay
+    updateDay,
+    deleteAppointmentStaff
 }
 
 export default dayService;

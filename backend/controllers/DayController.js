@@ -222,7 +222,20 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
             breaks
         });
     }else{
-        appointment = await (await Appointment.create({ user: req.user.id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+        const user_appointments = await Appointment.find({ user: req.user._id }).sort({date: 1, time: 1});
+        let valid = true;
+        for (let i=0; i<user_appointments.length; i++) {
+            let diffTime = Math.abs(user_appointments[i].date - date_);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            if (diffDays < 4 ) {
+                valid = false;
+            }
+        }
+        if (!valid) {
+            res.status(400);
+            throw new Error(`You can book appointments 4 days apart`);
+        }
+        appointment = await Appointment.create({ user: req.user.id, time: time, date: date_ }).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
         day.appointments.push(appointment._id);
         await day.save();
         res.status(200).json({

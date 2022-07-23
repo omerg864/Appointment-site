@@ -27,9 +27,10 @@ const userScheme = mongoose.Schema({
         required: true,
         unique: true,
     },
-    OTP: {
+    reset_token: {
         type: String,
         required: false,
+        unique: true,
     },
     staff: {
         type: Boolean,

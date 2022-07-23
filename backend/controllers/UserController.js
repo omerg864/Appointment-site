@@ -4,8 +4,10 @@ import Settings from '../models/SettingsModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Appointment from '../models/AppointmentModel.js';
+import crypto from 'crypto';
+import { sendEmail } from '../helpers/email.js';
 
-const deselect = ['-password', "-OTP", "-__v", "-createdAt", "-updatedAt"];
+const deselect = ['-password', "-reset_code", "-__v", "-createdAt", "-updatedAt"];
 
 
 const createSettings = async () => {
@@ -229,5 +231,43 @@ const authenticateStaff = asyncHandler(async (req, res, next) => {
     });
 });
 
+const sendResetEmail = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+    const user = await User.findOne({ "email" : { $regex : new RegExp(email, "i") } });
+    if (!user) {
+        res.status(400)
+        throw new Error("User does not exist");
+    }
+    let reset_token = crypto.randomBytes(20).toString("hex");
+    while (await User.findOne({ "reset_token" : reset_token })){
+        reset_token = crypto.randomBytes(20).toString("hex");
+    }
+    user.reset_token = reset_token;
+    await user.save();
+    const reset_url = `${process.env.SITE_ADDRESS}/resetPassword/${reset_token}`;
+    sendEmail(email, 'appointments App reset password', `to reset your password please go to /n ${reset_url}`);
+    res.status(200).json({
+        success: true,
+    });
+});
 
-export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticate, authenticateStaff };
+const resetUserPassword = asyncHandler(async (req, res, next) => {
+    const { password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await User.findOne({ reset_token: req.body.reset_token });
+    if (!user) {
+        res.status(400)
+        throw new Error("User does not exist");
+    }
+    user.password = hashedPassword;
+    user.reset_token = null;
+    await user.save();
+    res.status(200).json({
+        success: true,
+    });
+});
+
+
+
+export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticate, authenticateStaff, sendResetEmail, resetUserPassword };

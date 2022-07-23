@@ -24,6 +24,8 @@ function Users() {
 
     const [deleteOpen, setDeleteOpen] = useState(false);
 
+    const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const phone_regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$/im;
 
     useEffect(() => {
         if (auth.isError) {
@@ -38,13 +40,40 @@ function Users() {
     }, []);
 
     const saveUserChange = () => {
-        dispatch(updateUser(selectedUser)).then((res) => {
-            if (res.meta.requestStatus === 'fulfilled') {
-                toast.success('User updated');
-            }
-            dispatch(userReset());
-            closeModal();
-        });
+        let valid = true;
+        if (selectedUser.f_name === '') {
+            valid = false;
+            toast.error('First name is required');
+        }
+        if (selectedUser.l_name === '') {
+            valid = false;
+            toast.error('Last name is required');
+        }
+        if (selectedUser.email === '') {
+            valid = false;
+            toast.error('Email is required');
+        }
+        if (!email_regex.test(selectedUser.email)) {
+            valid = false;
+            toast.error('Email is invalid');
+        }
+        if (selectedUser.phone === '') {
+            valid = false;
+            toast.error('Phone is required');
+        }
+        if (!phone_regex.test(selectedUser.phone)) {
+            valid = false;
+            toast.error('Phone is invalid');
+        }
+        if (valid) {
+            dispatch(updateUser(selectedUser)).then((res) => {
+                if (res.meta.requestStatus === 'fulfilled') {
+                    toast.success('User updated');
+                }
+                dispatch(userReset());
+                closeModal();
+            });
+        }
     }
 
     const performDeleteUser = () => {

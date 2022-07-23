@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FloatingLabelInput from '../components/FloatingLabelInput';
+import { toast } from 'react-toastify';
 
 
 
@@ -7,8 +8,21 @@ function EmailResetPassword() {
 
     const [email, setEmail] = useState("");
 
+    const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
     const sendEmail = () => {
+      let valid = true;
+      if (email === '') {
+        valid = false;
+        toast.error('Email is required');
+      }
+      if (!email_regex.test(email)) {
+        valid = false;
+        toast.error('Email is invalid');
+      }
+      if (valid) {
         console.log("sendEmail");
+      }
     }
 
   return (

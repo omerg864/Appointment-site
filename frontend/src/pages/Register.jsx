@@ -25,6 +25,13 @@ function Register() {
     register_code: ""
   });
 
+  const password_regex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
+  const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  const phone_regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$/im;
+
+
+
   useEffect(() => {
     if (auth.isError){
       toast.error(auth.message);
@@ -32,10 +39,52 @@ function Register() {
   }, [auth.isError, auth.message]);
 
   const performRegistration = () => {
-    console.log(formData);
+    let clear = true;
+    if (formData.f_name === '') {
+      clear = false;
+      toast.error('Please enter your first name');
+    }
+    if (formData.l_name === '') {
+      toast.error('Please enter your last name');
+      clear = false;
+    }
+    if (formData.phone === '') {
+      toast.error('Please enter your phone number');
+      clear = false;
+    }
+    if (formData.email === '') {
+      toast.error('Please enter your email');
+      clear = false;
+    }
+    if (formData.password === '') {
+      toast.error('Please enter your password');
+      clear = false;
+    }
+    if (formData.confirmPassword === '') {
+      toast.error('Please confirm your password');
+      clear = false;
+    }
+    if (formData.register_code === '') {
+      toast.error('Please enter your register code');
+      clear = false;
+    }
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
-    }else {
+      clear = false;
+    }
+    if (!password_regex.test(formData.password)) {
+      toast.error('Password must be at least 8 characters long and contain at least one number, one lowercase and one uppercase letter');
+      clear = false;
+    }
+    if (!email_regex.test(formData.email)) {
+      toast.error('Please enter a valid email');
+      clear = false;
+    }
+    if (!phone_regex.test(formData.phone)) {
+      toast.error('Please enter a valid phone number');
+      clear = false;
+    }
+    if (clear) {
       dispatch(register(formData)).then((res) => {
         if (res.meta.requestStatus === 'fulfilled'){
           toast.success('Registration successful');

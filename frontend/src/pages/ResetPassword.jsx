@@ -18,17 +18,35 @@ function ResetPassword() {
         confirmPassword: '',
     })
 
+    
+    const password_regex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
+
     const savePassword = () => {
+        let valid = true;
+        if (formData.password === '') {
+            toast.error('Please enter your password');
+            valid = false;
+        }
+        if (formData.confirmPassword === '') {
+            toast.error('Please enter your password again');
+            valid = false;
+        }
+        if (!password_regex.test(formData.password)) {
+            toast.error('Password must be at least 8 characters long and contain at least one number, one lowercase and one uppercase letter');
+            valid = false;
+        }
         if (formData.password !== formData.confirmPassword) {
             toast.error('Passwords do not match');
-            return;
+            valid = false;
         }
+        if (valid) {
         dispatch(updateUserPassword({password: formData.password})).then((response) => {
             if (response.meta.requestStatus === "fulfilled") {
                 navigate('/');
                 toast.success('Password updated successfully');
             }
         });
+        }
     }
 
   return (

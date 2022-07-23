@@ -53,14 +53,43 @@ function Profile() {
   const gotoResetPassword = () => {
     navigate("/resetPassword");
   }
+  const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const phone_regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$/im;
 
   const saveProfile = () => {
-    dispatch(updateUser(formData)).then((response) => {
-      dispatch(userReset());
-      if (response.meta.requestStatus === 'fulfilled') {
-        toast.success("Profile updated successfully");
-      }
-    });
+    let valid = true;
+    if (formData.f_name === '') {
+      valid = false;
+      toast.error('Please enter your first name');
+    }
+    if (formData.l_name === '') {
+      valid = false;
+      toast.error('Please enter your last name');
+    }
+    if (formData.phone === '') {
+      valid = false;
+      toast.error('Please enter your phone number');
+    }
+    if (formData.email === '') {
+      valid = false;
+      toast.error('Please enter your email');
+    }
+    if (!email_regex.test(formData.email)) {
+      valid = false;
+      toast.error('Please enter a valid email');
+    }
+    if (!phone_regex.test(formData.phone)) {
+      valid = false;
+      toast.error('Please enter a valid phone number');
+    }
+    if (valid) {
+      dispatch(updateUser(formData)).then((response) => {
+        dispatch(userReset());
+        if (response.meta.requestStatus === 'fulfilled') {
+          toast.success("Profile updated successfully");
+        }
+      });
+    }
   }
 
   Date.prototype.addDays = function(days) {

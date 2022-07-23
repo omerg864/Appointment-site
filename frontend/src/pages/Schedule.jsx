@@ -16,6 +16,10 @@ function Schedule() {
 
     const [schedule, setSchedule] = useState([]);
 
+    const time_regex = /^([0-1]+[0-9]|2[0-3]):[0-5][0-9]$/;
+
+    const interval_regex = /^[1-9]?[0-9]{1}[mh]{1}$/i;
+
     useEffect(() => {
         if (settings.isError) {
             toast.error(settings.message);
@@ -32,12 +36,35 @@ function Schedule() {
     }, []);
 
     const saveScheduleChange = () => {
-        dispatch(updateSettings({site_description: settings.settings.site_description, register_code: settings.settings.register_code, schedule: schedule})).then((response) => {
-            if (response.meta.requestStatus === 'fulfilled') {
-                toast.success('Settings updated');
+        let valid = true;
+        for (let i = 0; i < schedule.length; i++) {
+            if (!time_regex.test(schedule[i].start_time)) {
+                toast.error(`Time ${schedule[i].start_time} is invalid`);
+                valid = false;
             }
-            dispatch(settingsReset());
-        });
+            if (!time_regex.test(schedule[i].end_time)) {
+                toast.error(`Time ${schedule[i].end_time} is invalid`);
+                valid = false;
+            }
+            for (let j = 0; j < schedule[i].breaks.length; j++) {
+                if (!time_regex.test(schedule[i].breaks[j])) {
+                    toast.error(`Time ${schedule[i].breaks[j]} is invalid`);
+                    valid = false;
+                }
+            }
+            if (!interval_regex.test(schedule[i].interval)) {
+                toast.error(`Interval ${schedule[i].interval} is invalid`);
+                valid = false;
+            }
+        }
+        if (valid){
+            dispatch(updateSettings({site_description: settings.settings.site_description, register_code: settings.settings.register_code, schedule: schedule})).then((response) => {
+                if (response.meta.requestStatus === 'fulfilled') {
+                    toast.success('Settings updated');
+                }
+                dispatch(settingsReset());
+            });
+        }
     }
 
     const scheduleChange = (name, value, index, add, pop) => {

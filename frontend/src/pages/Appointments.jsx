@@ -70,6 +70,10 @@ function Appointments() {
         _id: '',
     });
 
+    const time_regex = /^([0-1]+[0-9]|2[0-3]):[0-5][0-9]$/;
+
+    const interval_regex = /^[1-9]?[0-9]{1}[mh]{1}$/i;
+
     useEffect(() => {
         dispatch(getDayAppointments(formatUrlDate(date))).then(() => {
             dispatch(reset());
@@ -183,12 +187,45 @@ function Appointments() {
     }
 
     const saveDay = () => {
-        dispatch(updateDay(daySelected)).then((res) => {
-            if (res.meta.requestStatus === 'fulfilled'){
-                dispatch(reset());
+        let valid = true;
+        if (daySelected.start_time === ''){
+            toast.error("Please enter a start time");
+            valid = false;
+        }
+        if (daySelected.end_time === ''){
+            toast.error("Please enter an end time");
+            valid = false;
+        }
+        if (daySelected.interval === ''){
+            toast.error("Please enter an interval");
+            valid = false;
+        }
+        if (!interval_regex.test(daySelected.interval)){
+            toast.error("Please enter a valid interval");
+            valid = false;
+        }
+        if (!time_regex.test(daySelected.start_time)){
+            toast.error("Please enter a valid start time");
+            valid = false;
+        }
+        if (!time_regex.test(daySelected.end_time)){
+            toast.error("Please enter a valid end time");
+            valid = false;
+        }
+        for (let i = 0; i < daySelected.breaks.length; i++){
+            if (!time_regex.test(daySelected.breaks[i])){
+                toast.error(`Interval ${daySelected.breaks[i]} is invalid`);
+                valid = false;
             }
-        });
-        closeDayModal();
+        }
+        if (valid){
+            dispatch(updateDay(daySelected)).then((res) => {
+                if (res.meta.requestStatus === 'fulfilled'){
+                    dispatch(reset());
+                }
+            });
+            closeDayModal();
+        }
     };
 
     const radioChange = (e) => {

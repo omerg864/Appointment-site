@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { sendResetEmail, reset } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+import Spinner from '../components/Spinner';
 
 
 
 function EmailResetPassword() {
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
 
+    const auth = useSelector(state => state.auth);
+
     const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    useEffect(() => {
+        if (auth.isError) {
+            toast.error(auth.message);
+        }
+      }, [auth.isError, auth.message]);
 
     const sendEmail = () => {
       let valid = true;
@@ -21,8 +36,18 @@ function EmailResetPassword() {
         toast.error('Email is invalid');
       }
       if (valid) {
-        console.log("sendEmail");
+        dispatch(sendResetEmail({email: email})).then((response) => {
+          if (response.meta.requestStatus === "fulfilled") {
+            toast.success('Email sent successfully');
+            navigate('/');
+          }
+          dispatch(reset());
+        });
       }
+    }
+
+    if (auth.isLoading) {
+      return <Spinner />;
     }
 
   return (

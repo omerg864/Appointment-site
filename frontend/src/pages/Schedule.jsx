@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
 import { getManagerSettings, reset as settingsReset, updateSettings } from '../features/settings/settingsSlice';
+import { authenticateStaff, reset as userReset } from '../features/auth/authSlice';
+import Page403 from './Page403';
 
 function Schedule() {
 
@@ -13,12 +15,27 @@ function Schedule() {
 
     const settings = useSelector(state => state.settings);
 
+    const auth = useSelector(state => state.auth);
+
 
     const [schedule, setSchedule] = useState([]);
 
     const time_regex = /^([0-1]+[0-9]|2[0-3]):[0-5][0-9]$/;
 
     const interval_regex = /^[1-9]?[0-9]{1}[mh]{1}$/i;
+
+    const [authenticatedStaff, setAuthenticatedStaff] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticateStaff()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticatedStaff(true);
+            } else {
+                setAuthenticatedStaff(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
 
     useEffect(() => {
         if (settings.isError) {
@@ -91,8 +108,12 @@ function Schedule() {
 
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    if (settings.isLoading) {
+    if (settings.isLoading || auth.isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticatedStaff) {
+        return <Page403 />;
     }
 
     return (

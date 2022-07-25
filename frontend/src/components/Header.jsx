@@ -44,14 +44,14 @@ function Header() {
 
     const logoutUser = () => {
         dispatch(logout()).then((response) => {
-            if (response.meta.requestStatus === "fulfilled") {
-                navigate('/');
-            } else {
+            if (response.meta.requestStatus !== "fulfilled") {
                 toast.error("Logout failed");
             }
             dispatch(reset());
         });
+        navigate('/');
     }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark header">
   <div className="container-fluid">

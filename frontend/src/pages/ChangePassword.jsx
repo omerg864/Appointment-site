@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import FloatingLabelInput from '../components/FloatingLabelInput';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { resetUserPassword, checkResetToken, reset } from '../features/auth/authSlice';
+import { updateUserPassword, reset, authenticate } from '../features/auth/authSlice';
 import Spinner from '../components/Spinner';
+import Page403 from './Page403';
 
 
 
 
-function ResetPassword() {
+function ChangePassword() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const params = useParams();
 
     const [formData, setFormData] = useState({
         password: '',
@@ -21,10 +21,18 @@ function ResetPassword() {
     });
 
     const auth = useSelector(state => state.auth);
+
     const password_regex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
 
+    const [authenticated, setAuthenticated] = useState(false);
+
     useEffect(() => {
-        dispatch(checkResetToken({token: params.resetToken})).then((response) => {
+        dispatch(authenticate()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticated(true);
+            } else {
+                setAuthenticated(false);
+            }
             dispatch(reset());
         });
     }, []);
@@ -54,7 +62,7 @@ function ResetPassword() {
             valid = false;
         }
         if (valid) {
-        dispatch(resetUserPassword({password: formData.password, reset_token: params.resetToken})).then((response) => {
+        dispatch(updateUserPassword({password: formData.password})).then((response) => {
             if (response.meta.requestStatus === "fulfilled") {
                 navigate('/');
                 toast.success('Password updated successfully');
@@ -64,8 +72,12 @@ function ResetPassword() {
         }
     }
 
-    if( auth.isLoading) {
+    if (auth.isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticated) {
+        return <Page403 />;
     }
 
   return (
@@ -80,4 +92,4 @@ function ResetPassword() {
   )
 }
 
-export default ResetPassword;
+export default ChangePassword;

@@ -11,10 +11,11 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
 import { getDayAppointments, reset, deleteAppointmentStaff, addBreak, updateAppointment, bookAppointment, deleteBreak, updateDay } from '../features/day/daySlice';
-import { getUsers, reset as userReset } from '../features/auth/authSlice';
+import { getUsers, reset as userReset, authenticateStaff } from '../features/auth/authSlice';
 import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
 import { MdModeEdit } from 'react-icons/md';
 import ScheduleDay from '../components/ScheduleDay';
+import Page403 from './Page403';
 
 
 function Appointments() {
@@ -73,6 +74,19 @@ function Appointments() {
     const time_regex = /^([0-1]+[0-9]|2[0-3]):[0-5][0-9]$/;
 
     const interval_regex = /^[1-9]?[0-9]{1}[mh]{1}$/i;
+
+    const [authenticatedStaff, setAuthenticatedStaff] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticateStaff()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticatedStaff(true);
+            } else {
+                setAuthenticatedStaff(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
 
     useEffect(() => {
         dispatch(getDayAppointments(formatUrlDate(date))).then(() => {
@@ -343,6 +357,10 @@ function Appointments() {
 
     if (isLoading || auth.isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticatedStaff) {
+        return <Page403 />;
     }
 
     return (

@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
-import { getUsers, reset as userReset, updateUser, deleteUser } from '../features/auth/authSlice';
+import { getUsers, reset as userReset, updateUser, deleteUser, authenticateStaff } from '../features/auth/authSlice';
 import UserDisplay from '../components/UserDisplay';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import Modal from '../components/Modal';
 import UserInfo from '../components/UserInfo';
+import Page403 from './Page403';
 
 function Users() {
 
@@ -26,6 +27,19 @@ function Users() {
 
     const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const phone_regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$/im;
+
+    const [authenticatedStaff, setAuthenticatedStaff] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticateStaff()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticatedStaff(true);
+            } else {
+                setAuthenticatedStaff(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
 
     useEffect(() => {
         if (auth.isError) {
@@ -116,6 +130,10 @@ function Users() {
 
     if (auth.isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticatedStaff) {
+        return <Page403 />;
     }
 
     return (

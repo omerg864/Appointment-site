@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Appointment from '../models/AppointmentModel.js';
 import crypto from 'crypto';
-import { sendEmail } from '../helpers/email.js';
+import sendEmail from '../helpers/email.js';
 
 const deselect = ['-password', "-reset_token", "-__v", "-createdAt", "-updatedAt"];
 
@@ -269,5 +269,17 @@ const resetUserPassword = asyncHandler(async (req, res, next) => {
 });
 
 
+const checkResetToken = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ reset_token: req.body.token });
+    if (!user) {
+        res.status(400)
+        throw new Error("Reset token not found");
+    }
+    res.status(200).json({
+        success: true,
+    });
+});
 
-export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticate, authenticateStaff, sendResetEmail, resetUserPassword };
+
+
+export { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticate, authenticateStaff, sendResetEmail, resetUserPassword, checkResetToken };

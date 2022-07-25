@@ -9,6 +9,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { getFreeDayAppointments, bookAppointment, reset } from '../features/day/daySlice';
 import { formatUrlDate, formatDate } from '../functions/dateFunctions';
+import { reset as userReset, authenticate } from '../features/auth/authSlice';
+import Page403 from './Page403';
 
 function Appointment() {
 
@@ -22,6 +24,19 @@ function Appointment() {
     const [isOpen, setIsOpen] = useState(false);
 
     const { day, isLoading, isError, message, isSuccess } = useSelector(state => state.day);
+
+    const [authenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticate()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticated(true);
+            } else {
+                setAuthenticated(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
 
     useEffect(() => {
         if (isError) {
@@ -72,6 +87,10 @@ function Appointment() {
 
     if (isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticated) {
+        return <Page403 />;
     }
 
     return (

@@ -53,6 +53,21 @@ const authenticateStaff = async (token) => {
     return response;
 }
 
+const sendResetEmail = async (data) => {
+    const response = await axios.post(API_URL + 'sendResetEmail', data);
+    return response;
+}
+
+const resetUserPassword = async (data) => {
+    const response = await axios.post(API_URL + 'resetUserPassword', data);
+    return response;
+}
+
+const checkResetToken = async (data) => {
+    const response = await axios.post(API_URL + 'checkResetToken', data);
+    return response;
+}
+
 const authService = {
     register,
     login,
@@ -63,7 +78,10 @@ const authService = {
     updateUserPassword,
     getUsers,
     authenticate,
-    authenticateStaff
+    authenticateStaff,
+    sendResetEmail,
+    resetUserPassword,
+    checkResetToken
 }
 
 export default authService;

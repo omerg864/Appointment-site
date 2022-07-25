@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import AppointmentView from "../components/AppointmentView";
 import Modal from "../components/Modal";
 import { getUserAppointments, reset, deleteAppointment } from '../features/day/daySlice';
-import { updateUser, reset as userReset } from '../features/auth/authSlice';
+import { updateUser, reset as userReset, authenticate } from '../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from "../components/Spinner";
 import { toast } from 'react-toastify';
 import { formatDate, formatUrlDate, toDate } from '../functions/dateFunctions';
+import Page403 from "./Page403";
 
 
 
@@ -35,6 +36,19 @@ function Profile() {
     id: "",
   });
 
+  const [authenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticate()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticated(true);
+            } else {
+                setAuthenticated(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
+
   useEffect(() => {
     if (isError) {
       toast.error(message);
@@ -51,7 +65,7 @@ function Profile() {
   }, []);
 
   const gotoResetPassword = () => {
-    navigate("/resetPassword");
+    navigate("/changePassword");
   }
   const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const phone_regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$/im;
@@ -117,6 +131,10 @@ function Profile() {
 
   if (isLoading || auth.isLoading) {
     return <Spinner />;
+  }
+
+  if (!authenticated) {
+    return <Page403 />;
   }
 
   return (

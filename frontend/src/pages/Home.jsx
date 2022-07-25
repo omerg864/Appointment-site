@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { getSiteSettings, reset } from '../features/settings/settingsSlice';
 import Spinner from '../components/Spinner';
 import { useEffect, useState } from 'react';
-import { authenticate, authenticateStaff } from '../features/auth/authSlice';
+import { reset as userReset, authenticate } from '../features/auth/authSlice';
+import { toast } from 'react-toastify';
+import Page403 from './Page403';
 
 
 
 function Home() {
 
-  const user = useSelector(state => state.auth.user);
+  const auth = useSelector(state => state.auth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,24 +26,22 @@ function Home() {
 
   const [authenticated, setAuthenticated] = useState(false);
 
-  const auth = useSelector(state => state.auth);
-
   useEffect(() => {
-    authenticate(auth.user).then(response => {
-      if (response.authenticated) {
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
-      }
+    dispatch(authenticate()).then((response) => {
+        if (response.meta.requestStatus === 'fulfilled') {
+            setAuthenticated(true);
+        } else {
+            setAuthenticated(false);
+        }
+        dispatch(userReset());
     });
-  }, []);
-
+}, [auth.user]);
 
   const gotoAppointment = () => {
     navigate('/appointment');
   }
 
-  if (isLoading) {
+  if (isLoading || auth.isLoading) {
     return <Spinner />;
   }
 
@@ -56,7 +56,7 @@ function Home() {
         </p>
         : (<div>
         <p>
-          Welcome {user && user.f_name}
+          Welcome {auth.user && auth.user.f_name}
           </p>
           <button className="btn btn-light" style={{width: '60%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
           </div>)}

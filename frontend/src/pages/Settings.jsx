@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { toast } from 'react-toastify';
 import { getManagerSettings, reset as settingsReset, updateSettings } from '../features/settings/settingsSlice';
+import { authenticateStaff, reset as userReset } from '../features/auth/authSlice';
+import Page403 from './Page403';
+
 
 function Settings() {
 
@@ -14,10 +17,26 @@ function Settings() {
 
     const settings = useSelector(state => state.settings);
 
+    const auth = useSelector(state => state.auth);
+
     const [settingsData, setSettingsData] = useState({
         site_description: '',
         register_code: '',
     });
+
+    const [authenticatedStaff, setAuthenticatedStaff] = useState(false);
+
+    useEffect(() => {
+        dispatch(authenticateStaff()).then((response) => {
+            if (response.meta.requestStatus === 'fulfilled') {
+                setAuthenticatedStaff(true);
+            } else {
+                setAuthenticatedStaff(false);
+            }
+            dispatch(userReset());
+        });
+    }, []);
+
 
 
     useEffect(() => {
@@ -44,8 +63,12 @@ function Settings() {
         });
     }
 
-    if (settings.isLoading) {
+    if (settings.isLoading || auth.isLoading) {
         return <Spinner />;
+    }
+
+    if (!authenticatedStaff) {
+        return <Page403 />;
     }
 
     return (

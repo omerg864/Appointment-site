@@ -101,25 +101,57 @@ export const getUsers = createAsyncThunk("auth/getUsers", async (_, thunkAPI) =>
     }
 });
 
-export const authenticate = async (user) => {
-    if (!user || !user.token){
-        return false;
-    }
-    else {
-        const response = await authService.authenticate(user.token);
+export const authenticate = createAsyncThunk("auth/authenticate", async (_, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.authenticate(token);
         return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
     }
-};
+});
 
-export const authenticateStaff = async (user) => {
-    if (!user || !user.token){
-        return false;
-    }
-    else {
-        const response = await authService.authenticateStaff(user.token);
+export const authenticateStaff = createAsyncThunk("auth/authenticateStaff", async (_, thunkAPI) => {
+    try{
+        const token = thunkAPI.getState().auth.user.token;
+        const response =  await authService.authenticateStaff(token);
         return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
     }
-};
+});
+
+export const sendResetEmail = createAsyncThunk("auth/sendResetEmail", async (data, thunkAPI) => {
+    try{
+        const response =  await authService.sendResetEmail(data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const resetUserPassword = createAsyncThunk("auth/resetUserPassword", async (data, thunkAPI) => {
+    try{
+        const response =  await authService.resetUserPassword(data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
+
+export const checkResetToken = createAsyncThunk("auth/checkResetToken", async (data, thunkAPI) => {
+    try{
+        const response =  await authService.checkResetToken(data);
+        return response.data;
+    }catch(error){
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        return thunkAPI.rejectWithValue({message});
+    }
+});
 
 export const authSlice = createSlice({
     name: "auth",
@@ -241,6 +273,66 @@ export const authSlice = createSlice({
             state.users = action.payload.users;
         });
         builder.addCase(getUsers.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(sendResetEmail.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(sendResetEmail.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.users = action.payload.users;
+        });
+        builder.addCase(sendResetEmail.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+        });
+        builder.addCase(resetUserPassword.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(resetUserPassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+        });
+        builder.addCase(resetUserPassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(checkResetToken.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(checkResetToken.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+        });
+        builder.addCase(checkResetToken.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(authenticate.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(authenticate.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+        });
+        builder.addCase(authenticate.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload.message;
+        });
+        builder.addCase(authenticateStaff.pending, (state, action) => {
+            state.isLoading = true;
+        });
+        builder.addCase(authenticateStaff.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+        });
+        builder.addCase(authenticateStaff.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.message = action.payload.message;

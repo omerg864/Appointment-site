@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticateStaff, authenticate, sendResetEmail, resetUserPassword } from '../controllers/UserController.js';
+import { registerUser, loginUser, getUser, updateUser, deleteUser, updateUserPassword, getUsers, authenticateStaff, authenticate, sendResetEmail, resetUserPassword, checkResetToken } from '../controllers/UserController.js';
 import { protectUser, protectStaff } from '../middleware/AuthMiddleware.js';
 
 const router = express.Router();
@@ -15,5 +15,6 @@ router.get('/authenticate', protectUser, authenticate);
 router.get('/authenticateStaff', protectStaff, authenticateStaff);
 router.post('/sendResetEmail', sendResetEmail);
 router.post('/resetUserPassword', resetUserPassword);
+router.post('/checkResetToken', checkResetToken);
 
 export default router;

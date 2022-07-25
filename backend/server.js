@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { errorHandler } from "./middleware/ErrorMiddleware.js";
 import connectDB from "./config/db.js";
 import colors from "colors";
+import { Socket } from "socket.io";
 // routes
 import userRoutes from "./routes/UserRoutes.js";
 import dayRoutes from "./routes/DayRoutes.js";
@@ -24,9 +25,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 });
+
+/*const io = new Socket(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        credentials: true
+    }
+});*/
 
 // routes
 app.use("/api/v1/users", userRoutes);

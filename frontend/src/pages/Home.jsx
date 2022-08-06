@@ -47,7 +47,7 @@ function Home() {
 
 
   return (
-    <>
+    <div className='login-container'>
       <h1 className="title">{process.env.REACT_APP_SITE_TITLE}</h1>
       <div className="description">
         {!authenticated ? 
@@ -58,7 +58,7 @@ function Home() {
         <p>
           Welcome {auth.user && auth.user.f_name}
           </p>
-          <button className="btn btn-light" style={{width: '60%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
+          <button className="btn btn-light" style={{width: '100%', height: '50px', marginBottom: '10px'}} onClick={gotoAppointment} id="btn-sub" >Book Appointment</button>
           </div>)}
       </div>
       {authenticated && settings.site_description.length > 0 && 
@@ -74,7 +74,7 @@ function Home() {
         <img className="short-pic" src="https://res.cloudinary.com/omerg/image/upload/v1658002861/Lior_Yair_Kashri_on_Instagram__%D7%A9%D7%91%D7%95%D7%A2_%D7%9E%D7%91%D7%95%D7%A8%D7%9A_%D7%9E%D7%9C%D7%90_%D7%91%D7%A2%D7%A9%D7%99%D7%99%D7%94_%EF%B8%8F_-_Google_Chrome_16_07_2022_23_06_55_bontod.png" alt="pic1" />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

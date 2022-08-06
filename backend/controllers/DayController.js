@@ -43,8 +43,6 @@ const createAppointmentsList = (date, start_time, end_time, interval) => {
     }
     let appointments = [];
     let start_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), start_time.split(':')[0], start_time.split(':')[1], 24, 0, 0, 0);
-    const offset = start_time_date.getTimezoneOffset();
-    console.log(offset);
     let end_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), end_time.split(':')[0], end_time.split(':')[1], 24, 0, 0, 0);
     while (start_time_date <= end_time_date) {
         appointments.push(checkZeroNeeded(start_time_date.getHours()) + ':' + checkZeroNeeded(start_time_date.getMinutes()));
@@ -118,13 +116,11 @@ const createDay = async (date) => {
 
 const getScheduleDay = async (req, res, next, dateFormatted) => {
     const date = new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]), 24, 0, 0, 0);
-    console.log(date);
     var day = await Day.findOne({ date: date }).populate('appointments', ['date', 'user', 'time', '_id']);
     if (!day){
         day = await createDay(date);
     }
     day = await day.populate('appointments.user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
-    console.log(day);
     let free_appointments = createAppointmentsList(day.date, day.startTime, day.endTime, day.interval);
     let schedule = calculateDay(free_appointments, day.breaks, day.appointments, date);
     return {schedule: schedule, start_time: day.startTime, end_time: day.endTime, interval: day.interval, breaks: day.breaks};
@@ -182,7 +178,6 @@ const getDayAppointments = asyncHandler(async (req, res, next) => {
 
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     const dateFormatted = req.params.date.split('-');
-    console.log(dateFormatted);
     let { schedule } = await getScheduleDay(req, res, next, dateFormatted);
     const date = formatToDate(req.params.date)
     let free_appointments = [];

@@ -121,6 +121,7 @@ const getScheduleDay = async (req, res, next, dateFormatted) => {
         day = await createDay(date);
     }
     day = await day.populate('appointments.user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+    console.log(day);
     let free_appointments = createAppointmentsList(day.date, day.startTime, day.endTime, day.interval);
     let schedule = calculateDay(free_appointments, day.breaks, day.appointments, date);
     return {schedule: schedule, start_time: day.startTime, end_time: day.endTime, interval: day.interval, breaks: day.breaks};
@@ -179,7 +180,6 @@ const getDayAppointments = asyncHandler(async (req, res, next) => {
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     const dateFormatted = req.params.date.split('-');
     let { schedule } = await getScheduleDay(req, res, next, dateFormatted);
-    console.log(schedule);
     const date = formatToDate(req.params.date)
     let free_appointments = [];
     schedule.forEach(appoint => {
@@ -187,7 +187,6 @@ const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
             free_appointments.push(appoint.time);
         }
     });
-    console.log(free_appointments);
     res.status(200).json({
         success: true,
         free_appointments,

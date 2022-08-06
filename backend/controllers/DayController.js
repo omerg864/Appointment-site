@@ -179,6 +179,7 @@ const getDayAppointments = asyncHandler(async (req, res, next) => {
 
 const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
     const dateFormatted = req.params.date.split('-');
+    console.log(dateFormatted);
     let { schedule } = await getScheduleDay(req, res, next, dateFormatted);
     const date = formatToDate(req.params.date)
     let free_appointments = [];

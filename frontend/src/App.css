@@ -77,17 +77,23 @@
   #button-outline-header {
     width: 100%;
   }
+  .title {
+    font-size: 26px;
+  }
+  .description {
+    font-size: 18px;
+  }
 }
 
 .title{
-  font-size: 4.5vw;
+  font-size: calc(1.375rem + 5vw);
   font-family: "Roboto", sans-serif;
   color: #A68B6A;
   text-shadow: 1vw 1vw 2vw black;
 }
 
 .description{
-  font-size: 2.25vw;
+  font-size: calc(1.375rem + 3vw);
   font-family: "Roboto", sans-serif;
   color: #A68B6A;
   text-shadow: 1vw 1vw 2vw black;
@@ -107,7 +113,7 @@
   background-color: rgba(66, 63, 63, 0.788);
   width: 100%;
   margin: auto;
-  font-size: 1.5vw;
+  font-size: calc(1rem + 1vw);
   box-shadow: 2vw 2vw 3vw black;
 }
 

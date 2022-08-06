@@ -207,7 +207,8 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
     }
     var appointment = ""
     if (staff && req.user.staff) {
-        appointment = await (await Appointment.create({ user: user_id, time: time, date: date_ })).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+        appointment = await Appointment.create({ user: user_id, time: time, date: date_ });
+        appointment = await appointment.populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
         day.appointments.push(appointment._id);
         await day.save();
         const dateFormatted = date.split('-');
@@ -235,7 +236,8 @@ const bookAppointment = asyncHandler(async (req, res, next) => {
             res.status(400);
             throw new Error(`You can book appointments 4 days apart`);
         }
-        appointment = await Appointment.create({ user: req.user.id, time: time, date: date_ }).populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
+        appointment = await Appointment.create({ user: req.user._id, time: time, date: date_ });
+        appointment = await appointment.populate('user', ['f_name', 'l_name', 'email', 'phone', 'staff', '_id']);
         day.appointments.push(appointment._id);
         await day.save();
         res.status(200).json({

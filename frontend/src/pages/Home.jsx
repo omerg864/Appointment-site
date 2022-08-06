@@ -47,7 +47,7 @@ function Home() {
 
 
   return (
-    <div className='login-container' style={{maxWidth: '55%'}}>
+    <div className='home-container'>
       <h1 className="title">{process.env.REACT_APP_SITE_TITLE}</h1>
       <div className="description">
         {!authenticated ? 

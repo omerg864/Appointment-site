@@ -235,6 +235,25 @@
   padding: 15px;
 }
 
+.home-container {
+  margin-right: auto;
+  margin-left: auto;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 55%;
+  border: white solid 2px;
+  border-radius: 5px;
+  background-color: rgba(26, 25, 24, 0.788);
+  padding: 15px;
+}
+
+@media (max-width: 991px) {
+  .home-container {
+    max-width: 100%;
+  }
+}
+
 .management-container {
   margin-right: auto;
   margin-left: auto;

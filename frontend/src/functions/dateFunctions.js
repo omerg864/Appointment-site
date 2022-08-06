@@ -15,6 +15,6 @@ export const formatUrlDate = (date) => {
 
 export const toDate = (date) => {
     var dateSplit = date.split("T")[0].split("-");
-    var formattedDate = new Date(parseInt(dateSplit[0]), parseInt(dateSplit[1]) - 1, parseInt(dateSplit[2]));
+    var formattedDate = new Date(parseInt(dateSplit[0]), parseInt(dateSplit[1]) - 1, parseInt(dateSplit[2]), 24, 0, 0, 0);
     return formattedDate;
 }

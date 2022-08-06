@@ -42,10 +42,10 @@ const createAppointmentsList = (date, start_time, end_time, interval) => {
         intervalMinutes = parseInt(interval.replace('h', '')) * 60;
     }
     let appointments = [];
-    let start_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), start_time.split(':')[0], start_time.split(':')[1], 0, 0, 0, 0);
+    let start_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), start_time.split(':')[0], start_time.split(':')[1], 24, 0, 0, 0);
     const offset = start_time_date.getTimezoneOffset();
     console.log(offset);
-    let end_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), end_time.split(':')[0], end_time.split(':')[1], 0, 0, 0, 0);
+    let end_time_date = new Date(date.getDate(), date.getMonth(), date.getFullYear(), end_time.split(':')[0], end_time.split(':')[1], 24, 0, 0, 0);
     while (start_time_date <= end_time_date) {
         appointments.push(checkZeroNeeded(start_time_date.getHours()) + ':' + checkZeroNeeded(start_time_date.getMinutes()));
         start_time_date.setMinutes(start_time_date.getMinutes() + intervalMinutes);
@@ -117,7 +117,7 @@ const createDay = async (date) => {
 
 
 const getScheduleDay = async (req, res, next, dateFormatted) => {
-    const date = new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]), 0, 0, 0, 0);
+    const date = new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]), 24, 0, 0, 0);
     console.log(date);
     var day = await Day.findOne({ date: date }).populate('appointments', ['date', 'user', 'time', '_id']);
     if (!day){
@@ -200,7 +200,7 @@ const getFreeDayAppointments = asyncHandler(async (req, res, next) => {
 
 const formatToDate = (date) => {
     const dateFormatted = date.split('-');
-    return new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]), 0, 0, 0, 0);
+    return new Date(parseInt(dateFormatted[2]), parseInt(dateFormatted[1]) - 1, parseInt(dateFormatted[0]), 24, 0, 0, 0);
 }
 
 const bookAppointment = asyncHandler(async (req, res, next) => {
